@@ -1,0 +1,5 @@
+node_modules/
+package*.json
+posts/*/slide-*
+posts/*/contact*.png
+__pycache__/
