@@ -207,9 +207,10 @@ def preview():
     t = {}
     for key, png in {
         "1": f"{P}/2026-10-15-01-intro/slide-1.png", "2": f"{P}/2026-10-16-02-prices/slide-1.png",
-        "3": f"{P}/2026-10-18-03-how-to-order/slide-1.png", "4": f"{P}/2026-10-19-04-before-you-design-1/slide-1.png",
+        "3": f"{P}/2026-10-18-03-how-to-order/slide-1.png", "4": f"{P}/2026-10-18-04-before-you-design-1/slide-1.png",
         "5": f"{D}/05/cover-grid.png", "6": f"{D}/06/cover-grid.png",
-        "7": f"{P}/2026-10-18-07-graduation-project-1/slide-1.png", "8": f"{D}/08/cover-grid.png",
+        "7": f"{P}/2026-10-21-07-graduation-project-1/slide-1.png", "8": f"{D}/08/cover-grid.png",
+        "9": f"{D}/09/slide-1.png",
     }.items():
         out = os.path.join(OUT, f"tile-{key}.jpg")
         grid_tile(png).save(out, quality=92)
@@ -219,7 +220,7 @@ def preview():
     rows = [[tile(t["3"], ("pin",)), tile(t["2"], ("pin",)), tile(t["1"], ("pin",))],
             [tile(t["6"], ("reel",)), tile(t["5"], ("reel",)), tile(t["4"], ("carousel",))]]
     asyncio.run(shoot_page(profile_html(rows, avatar), os.path.join(OUT, "profile-6.png")))
-    row3 = [[placeholder("9<br>قبل أن تصمّم 2<br>(قيد التصميم)"), tile(t["8"], ("reel",)), tile(t["7"], ("carousel",))],
+    row3 = [[tile(t["9"], ("carousel",)), tile(t["8"], ("reel",)), tile(t["7"], ("carousel",))],
             [tile(t["6"], ("reel",)), tile(t["5"], ("reel",)), tile(t["4"], ("carousel",))],
             [tile(t["3"], ("pin",)), tile(t["2"], ("pin",)), tile(t["1"], ("pin",))]]
     # with pinned posts on top the real order is pinned row first; this second image just shows row 3 beside row 2
