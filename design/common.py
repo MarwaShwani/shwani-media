@@ -15,8 +15,9 @@ def fontlinks():
     return "".join(f'<link rel="stylesheet" href="file://{FONTS}/{w}.css">' for w in (100, 300, 400, 500, 600, 700, 800))
 
 
-def page(body, extra_css="", light=False):
-    bg, fg = (CH, DK) if light else (DK, CH)
+def page(body, extra_css="", light=False, bg=None, fg=None):
+    """light=True gives the milky base; bg/fg override both for other row colours (e.g. TL with CH text)."""
+    bg, fg = (bg, fg) if bg else ((CH, DK) if light else (DK, CH))
     return f"""<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">{fontlinks()}
 <style>
 *{{box-sizing:border-box}}

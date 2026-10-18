@@ -192,12 +192,12 @@ def closing():
         + '<p style="font-size:34px;line-height:1.7">اكتب رقمه في التعليقات.</p>'
         + GROW
         + f'<div class="z" style="background:{MU};color:{DK};border-radius:36px;padding:38px 44px">'
-          '<div style="font-size:27px;font-weight:600;margin-bottom:10px">الحلقة 2، الاثنين القادم</div>'
+          '<div style="font-size:27px;font-weight:600;margin-bottom:10px">الحلقة 2</div>'
           '<div style="font-size:46px;font-weight:800;line-height:1.4">كيف تختار ألوان مشروعك</div></div>'
         + spacer(36)
         + '<p style="font-size:30px;font-weight:500;line-height:1.6">احفظ المنشور، وأرسله لصاحب مشروع جديد.</p>'
         + spacer(48)
-        + bottom(right_html=mark_inline(56, DK, TE))
+        + bottom(right_html=lockup_svg(250, DK))     # full SHWANI logo, not SH alone (Marwa, 15 Oct)
     )
     return page(body, light=True)
 
