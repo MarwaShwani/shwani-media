@@ -24,8 +24,14 @@ SERIES = "أعمالنا · الحلقة 1"
 WS = shwani(DK, TE).width()    # 4205 units at cap height 700
 
 
+def teal_caps():
+    """Marwa, 19 Oct evening: teal capsules in the design's background, on every slide."""
+    return (deco(f"right:-80px;top:-20px;width:230px;height:72px;border-radius:36px;background:{TL};transform:rotate(14deg)")
+            + deco(f"left:-70px;bottom:150px;width:200px;height:64px;border-radius:32px;background:{TL};transform:rotate(-10deg)"))
+
+
 def pg(body):
-    return page(body, bg=ROW_BG, fg=INK)
+    return page(teal_caps() + body, bg=ROW_BG, fg=INK)
 
 
 def word(width, color=CH, bar=TE, sharp=False):
@@ -62,7 +68,7 @@ def num(k, size=60, bg=DK, fg=CH):
 def tip(text, label="الفكرة"):
     return (f'<div class="z" style="border:3px solid {CH};border-radius:32px;padding:26px 34px;display:flex;gap:22px;align-items:center">'
             f'<span style="flex-shrink:0;font-size:30px;font-weight:800;background:{DK};color:{CH};border-radius:24px;padding:6px 20px">{label}</span>'
-            f'<span style="flex:1;font-size:32px;font-weight:500;line-height:1.55;text-wrap:balance">{text}</span></div>')
+            f'<span style="flex:1;font-size:36px;font-weight:500;line-height:1.5;text-wrap:balance">{text}</span></div>')
 
 
 # ---------- slides ----------
@@ -80,7 +86,7 @@ def cover():
         + GROW
         + '<h1 style="font-size:96px;line-height:1.2">كيف صمّمنا<br>شعار <span class="ltr">SHWANI</span>؟</h1>'
         + spacer(26)
-        + '<p style="font-size:34px;line-height:1.7">قصة هويتنا، من الفكرة إلى الشعار.</p>'
+        + '<p style="font-size:36px;line-height:1.65">قصة هويتنا، من الفكرة إلى الشعار.</p>'
         + spacer(70) + bottom(arrow=CH)
     )
     return pg(body)
@@ -93,17 +99,17 @@ GOALS = [("يُقرأ بسهولة", "من بعيد على لافتة، ومن �
 
 def s_goals():
     rows = "".join(
-        f'<div style="display:flex;align-items:center;gap:28px;padding:30px 0;{"border-top:2px solid rgba(32,33,38,.18);" if k else ""}">'
+        f'<div style="display:flex;align-items:center;gap:28px;padding:22px 0;{"border-top:2px solid rgba(32,33,38,.18);" if k else ""}">'
         f'{num(k + 1, 70)}<div style="flex:1"><div style="font-size:46px;font-weight:800">{a}</div>'
-        f'<div style="font-size:33px;font-weight:400;color:{DIM};margin-top:8px;line-height:1.5">{b}</div></div></div>'
+        f'<div style="font-size:36px;font-weight:400;color:{DIM};margin-top:6px;line-height:1.35">{b}</div></div></div>'
         for k, (a, b) in enumerate(GOALS))
     body = (
         top("قبل الرسم", 2, N)
-        + spacer(60)
+        + spacer(46)
         + '<h1 style="font-size:70px;line-height:1.3">قبل أن نرسم،<br>كتبنا ماذا نريد</h1>'
-        + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65">ثلاثة شروط وضعناها لشعارنا، كما نضعها مع كل عميل:</p>'
-        + spacer(30)
+        + spacer(16)
+        + '<p style="font-size:36px;font-weight:400;line-height:1.5">ثلاثة شروط وضعناها لشعارنا، كما نضعها مع كل عميل:</p>'
+        + spacer(20)
         + f'<div class="z">{rows}</div>'
         + GROW + tip("نبدأ دائماً بسؤال: ماذا يجب أن يقول الشعار؟ ثم نرسم.", "طريقتنا")
         + spacer(44) + bottom(arrow=CH)
@@ -136,7 +142,7 @@ def s_idea():
         + spacer(60)
         + '<h1 style="font-size:70px;line-height:1.3">الفكرة: جسر<br>داخل الاسم نفسه</h1>'
         + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">عميلنا يأتي بمشكلة، ويريد نتيجة. عملنا هو ما بينهما.</p>'
+        + '<p style="font-size:36px;font-weight:400;line-height:1.6;text-wrap:balance">عميلنا يأتي بمشكلة، ويريد نتيجة. عملنا هو ما بينهما.</p>'
         + spacer(44)
         + card(art, CARD_L, "40px 40px")
         + GROW + tip("لون التيراكوتا في الشعار كله لهذه الوصلة وحدها، فتلفت العين إليها.", "التفصيل")
@@ -147,11 +153,11 @@ def s_idea():
 
 def s_shape():
     def side(label, ok, sharp, note):
-        mark = (f'<span style="font-size:28px;font-weight:800;padding:6px 18px;border-radius:20px;'
+        mark = (f'<span style="font-size:30px;font-weight:800;padding:6px 18px;border-radius:20px;'
                 f'background:{TE if ok else "rgba(242,233,216,.16)"};color:{DK if ok else CH}">{label}</span>')
         return (f'<div style="display:flex;flex-direction:column;align-items:center;gap:22px">'
                 f'<div style="display:flex;gap:18px;align-items:center">{mark}'
-                f'<span style="font-size:31px;font-weight:400;color:rgba(242,233,216,.82)">{note}</span></div>'
+                f'<span style="font-size:34px;font-weight:400;color:rgba(242,233,216,.82)">{note}</span></div>'
                 f'{word(660, CH, TE, sharp=sharp)}</div>')
     pair = (f'<div style="display:flex;flex-direction:column;gap:34px">'
             f'{side("أطراف حادة", False, True, "رسمية وباردة")}'
@@ -162,7 +168,7 @@ def s_shape():
         + spacer(60)
         + '<h1 style="font-size:70px;line-height:1.3">الحروف نفسها،<br>وإحساس مختلف</h1>'
         + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">رسمنا كل حرف بخط واحد بسمك ثابت، ثم جرّبنا الأطراف:</p>'
+        + '<p style="font-size:36px;font-weight:400;line-height:1.6;text-wrap:balance">رسمنا كل حرف بخط واحد بسمك ثابت، ثم جرّبنا الأطراف:</p>'
         + spacer(44)
         + card(pair, CARD_D, "38px 44px")
         + GROW + tip("السُّمك الثابت يبقى واضحاً حتى حين يصغر الشعار على قلم أو ختم.", "لماذا")
@@ -178,22 +184,22 @@ COLORS = [(DK, CH, "فحمي", "القاعدة والكتابة"), (CH, DK, "ح�
 
 def s_colors():
     rows = "".join(
-        f'<div style="display:flex;align-items:center;gap:26px;padding:20px 26px;border-radius:30px;background:{CH}">'
-        f'<span style="flex-shrink:0;width:96px;height:96px;border-radius:48px;background:{c};'
+        f'<div style="display:flex;align-items:center;gap:26px;padding:13px 26px;border-radius:30px;background:{CH}">'
+        f'<span style="flex-shrink:0;width:90px;height:90px;border-radius:45px;background:{c};'
         f'{"border:3px solid rgba(32,33,38,.25);" if c in (CH, TE) else ""}"></span>'
         f'<div style="flex:1"><div style="font-size:40px;font-weight:800;color:{DK}">{name}</div>'
-        f'<div style="font-size:31px;font-weight:400;color:rgba(32,33,38,.72);margin-top:4px">{role}</div></div>'
+        f'<div style="font-size:33px;font-weight:400;color:rgba(32,33,38,.72);margin-top:2px">{role}</div></div>'
         f'<span class="ltr" style="font-size:30px;font-weight:500;color:rgba(32,33,38,.6)">{c}</span></div>'
         for c, fg, name, role in COLORS)
     body = (
         top("الألوان", 5, N)
-        + spacer(56)
+        + spacer(44)
         + '<h1 style="font-size:70px;line-height:1.3">خمسة ألوان،<br>ولكل لون عمل</h1>'
-        + spacer(36)
-        + f'<div class="z" style="display:flex;flex-direction:column;gap:16px">{rows}</div>'
+        + spacer(26)
+        + f'<div class="z" style="display:flex;flex-direction:column;gap:12px">{rows}</div>'
         + GROW
-        + '<p style="font-size:32px;font-weight:500;line-height:1.6">ولكل خدمة لون في منشوراتنا: هذا الصف بلون الهوية البصرية.</p>'
-        + spacer(44) + bottom(arrow=CH)
+        + '<p style="font-size:36px;font-weight:500;line-height:1.55">ولكل خدمة لون في منشوراتنا: هذا الصف بلون الهوية البصرية.</p>'
+        + spacer(36) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -203,14 +209,14 @@ def s_sizes():
     rows = "".join(
         f'<div style="display:flex;align-items:center;justify-content:space-between;gap:30px;padding:24px 0;'
         f'{"border-top:2px solid rgba(242,233,216,.16);" if k else ""}">'
-        f'<div style="font-size:32px;font-weight:600;color:{CH};white-space:nowrap">{lab}</div>{full(w, CH) if f else word(w, CH)}</div>'
+        f'<div style="font-size:34px;font-weight:600;color:{CH};white-space:nowrap">{lab}</div>{full(w, CH) if f else word(w, CH)}</div>'
         for k, (w, lab, f) in enumerate(sizes))
     body = (
         top("الاختبار", 6, N)
         + spacer(56)
         + '<h1 style="font-size:70px;line-height:1.3">اختبرناه كبيراً<br>وصغيراً</h1>'
         + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">'
+        + '<p style="font-size:36px;font-weight:400;line-height:1.6;text-wrap:balance">'
           'الخط <span class="ltr">Alexandria</span> للعربية والإنجليزية معاً، وفي المقاس الصغير جداً تكفي كلمة <span class="ltr">SHWANI</span> وحدها:</p>'
         + spacer(36)
         + card(rows, CARD_D, "20px 52px")
@@ -234,7 +240,7 @@ def closing():
           f'<div style="font-size:30px;font-weight:700;margin-bottom:10px;color:{TE}">الحلقة 2</div>'
           '<div style="font-size:48px;font-weight:800;line-height:1.4">الهوية على أرض الواقع</div></div>'
         + spacer(34)
-        + '<p style="font-size:32px;font-weight:600;line-height:1.6">احفظ المنشور، وأرسله لصاحب مشروع جديد.</p>'
+        + '<p style="font-size:36px;font-weight:600;line-height:1.55">احفظ المنشور، وأرسله لصاحب مشروع جديد.</p>'
         + spacer(44)
         + bottom(right_html=mono(250, CH))
     )
