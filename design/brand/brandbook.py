@@ -206,7 +206,7 @@ def p08_misuse():
 
 
 CORE = [("فحمي", "Charcoal", DK, "32 33 38", "0 0 0 90", CH), ("حليبي", "Milky", CH, "242 233 216", "0 4 11 5", DK),
-        ("تيراكوتا", "Terracotta", TE, "224 122 71", "0 55 75 0", WHITE), ("مسطردي", "Mustard", MU, "212 167 44", "0 21 90 17", DK),
+        ("تيراكوتا", "Terracotta", TE, "224 122 71", "0 55 75 0", DK), ("مسطردي", "Mustard", MU, "212 167 44", "0 21 90 17", DK),
         ("أخضر مزرق", "Teal", TL, "47 111 109", "58 0 2 56", CH)]   # Marwa, 20 Oct: teal joins the identity colours
 SERV = [("وردي مغبر", "Dusty rose", RO, "196 124 138", "0 37 30 23", DK, "الهوية البصرية، مع التيراكوتا"),
         ("أزرق رمادي", "Slate", SL, "89 113 138", "36 18 0 46", CH, "السير الذاتية"),
@@ -226,7 +226,7 @@ def swatch(ar, en, hx, rgb, cmyk, fg, note="", h="108mm"):
 def p09_core():
     cells = [swatch(*c) for c in CORE]
     page(9, "03 · الألوان", "الألوان الأساسية",
-         area(grid(cells, 5, "5mm") + p('الفحمي قاعدة العلامة، والحليبي للنص والشعار عليه، والتيراكوتا لون الوصلة والحل، والمسطردي لمسة ذهبية صغيرة، والأخضر المزرق للكبسولات في الخلفية. '
+         area(grid(cells, 5, "5mm") + p('الفحمي قاعدة العلامة، والحليبي للنص والشعار عليه، والتيراكوتا لون الوصلة والحل، والمسطردي لمسة ذهبية صغيرة، والأخضر المزرق لمسة هادئة. '
                                         'قيم <span class="en">CMYK</span> تقريبية؛ تُطابق مع المطبعة على عيّنة قبل الطباعة الكبيرة.', "3.1mm", GREY, "6mm"), top=40))
 
 
@@ -242,13 +242,13 @@ def p11_ratio():
            f'<div style="flex:25;background:{CH};display:flex;align-items:center;justify-content:center;font-size:3.4mm;border-top:.3mm solid {RULE};border-bottom:.3mm solid {RULE}" class="en">25%</div>'
            f'<div style="flex:10;background:{TE};display:flex;align-items:center;justify-content:center;font-size:3.2mm" class="en">10%</div>'
            f'<div style="flex:5;background:{MU}"></div></div>')
-    pairs = [(TE, WHITE), (RO, DK), (SG, DK), (MU, DK), (SL, CH), (TL, CH), (PL, CH), (DK, CH)]
+    pairs = [(TE, DK), (RO, DK), (SG, DK), (MU, DK), (SL, CH), (TL, CH), (PL, CH), (DK, CH)]
     chips = "".join(f'<div style="background:{b};color:{f};border-radius:3mm;padding:9mm 3mm;text-align:center;font-size:4mm;font-weight:700">نص واضح</div>' for b, f in pairs)
     body = area(f'<div style="font-size:4.2mm;font-weight:700;margin-bottom:3mm">النِّسب في التصميم الواحد</div>{bar}'
                 f'<div style="font-size:2.9mm;color:{GREY};margin-top:2mm">فحمي 60%، حليبي 25%، تيراكوتا 10%، مسطردي 5% أو أقل.</div>'
                 f'<div style="font-size:4.2mm;font-weight:700;margin:9mm 0 3mm">لون النص على كل خلفية</div>'
                 f'<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3mm">{chips}</div>'
-                + p('الكتابة بيضاء فوق التيراكوتا، وفحمية فوق الوردي والمريمي والمسطردي، وحليبية فوق الأزرق والأخضر المزرق والبنفسجي والفحمي. '
+                + p('الكتابة فحمية فوق التيراكوتا والوردي والمريمي والمسطردي، وحليبية فوق الأزرق والأخضر المزرق والبنفسجي والفحمي. '
                     'لا مسطردي على الأخضر المزرق، فيبدو باهتاً.', "3.1mm", GREY, "4mm"), top=40)
     page(11, "03 · الألوان", "النِّسب والتباين", body)
 

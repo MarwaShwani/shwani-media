@@ -1,14 +1,13 @@
 """Post 10: carousel «أعمالنا» الحلقة 1 — كيف صمّمنا شعار SHWANI. 7 slides.
 
 Row 4: terracotta base (#E07A47). Marwa's decisions:
-- 19 Oct: text on the orange background is white and its shades (was charcoal). Pure white for the
-  main text and milky for secondary lines, with heavier weights, because white on orange has less
-  contrast than charcoal did.
+- 19 Oct: text on the orange background went white; 20 Oct: back to charcoal (#202126), as in the
+  first draft, keeping the phone sizes.
 - 19 Oct: no price is mentioned in any post (the closing slide's price line was removed).
 - 20 Oct: Alexandria only (common.require_font stops the build if it is missing), text sized for phone
   screens (base rule: headlines >= 84px, body >= 44px, nothing below 36px; check_marks() enforces the
-  36px floor), and teal (#2F6F6D) capsules in the background of every slide, never behind text.
-  Teal joins the identity colours, so slide 5 now shows six.
+  36px floor). Teal (#2F6F6D) joins the identity colours, so slide 5 shows six. The teal background
+  capsules were removed the same night: too crowded.
 - the identity is the word SHWANI only: no SH monogram, no lone H, no H pattern.
 - no logo or word is cut at the slide edge; check_marks() fails the build if one is.
 The terracotta link would vanish on a terracotta ground, so the logo always sits on a charcoal or milky card.
@@ -21,8 +20,8 @@ from rounded import shwani, lockup  # noqa: E402
 
 WH = "#FFFFFF"
 ROW_BG = TE
-INK = WH                       # main text on terracotta
-SUB = CH                       # secondary text on terracotta (milky, full opacity)
+INK = DK                       # text on terracotta: charcoal again (Marwa, 20 Oct)
+SUB = DK                       # secondary text on terracotta
 CARD_D = DK                    # charcoal card, milky text
 CARD_L = CH                    # milky card, charcoal text
 N = 7
@@ -67,7 +66,7 @@ def full(width, color=CH, sub=None):
               .replace(' width="', ' data-w="', 1).replace(' height="1180"', '', 1)
 
 
-def mono(width, color=WH):
+def mono(width, color=DK):
     """One-colour lockup: on terracotta the terracotta link would vanish, so the whole logo takes one ink."""
     svg = lockup(color, color, color)
     return svg.replace('<svg ', f'<svg class="wm" style="width:{width}px;height:auto;display:block;flex-shrink:0" ', 1) \
@@ -84,7 +83,7 @@ def num(k, size=76, bg=DK, fg=CH):
 
 
 def tip(text, label):
-    return (f'<div class="z" style="border:4px solid {WH};border-radius:34px;padding:26px 32px;display:flex;gap:24px;align-items:center">'
+    return (f'<div class="z" style="border:4px solid {DK};border-radius:34px;padding:26px 32px;display:flex;gap:24px;align-items:center">'
             f'<span style="flex-shrink:0;font-size:{SMALL}px;font-weight:800;background:{DK};color:{CH};border-radius:26px;padding:8px 22px">{label}</span>'
             f'<span style="flex:1;font-size:40px;font-weight:600;line-height:1.4;text-wrap:balance">{text}</span></div>')
 
@@ -104,10 +103,9 @@ def cover():
         + h1('كيف صمّمنا<br>شعار <span class="ltr">SHWANI</span>؟', 100)
         + spacer(22)
         + lead("قصة هويتنا، من الفكرة إلى الشعار.")
-        + spacer(56) + bottom(arrow=WH)
+        + spacer(56) + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:250px;top:214px", 250, 76, -12), ("left:-120px;top:1010px", 270, 80, 14),
-                          ("left:150px;top:1112px", 130, 46, 14)])
+    return pg(body)
 
 
 GOALS = [("يُقرأ بسهولة", "من بعيد ومن قريب."),
@@ -117,7 +115,7 @@ GOALS = [("يُقرأ بسهولة", "من بعيد ومن قريب."),
 
 def s_goals():
     rows = "".join(
-        f'<div style="display:flex;align-items:center;gap:28px;padding:20px 0;{"border-top:3px solid rgba(255,255,255,.35);" if k else ""}">'
+        f'<div style="display:flex;align-items:center;gap:28px;padding:20px 0;{"border-top:3px solid rgba(32,33,38,.2);" if k else ""}">'
         f'{num(k + 1)}<div style="flex:1"><div style="font-size:52px;font-weight:800;line-height:1.25">{a}</div>'
         f'<div style="font-size:{BODY}px;font-weight:500;color:{SUB};line-height:1.35">{b}</div></div></div>'
         for k, (a, b) in enumerate(GOALS))
@@ -130,9 +128,9 @@ def s_goals():
         + spacer(14)
         + f'<div class="z">{rows}</div>'
         + GROW + tip("نسأل أولاً: ماذا يقول الشعار؟ ثم نرسم.", "طريقتنا")
-        + spacer(34) + bottom(arrow=WH)
+        + spacer(34) + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:96px;top:200px", 230, 72, -12), ("left:250px;top:300px", 120, 44, -12)])
+    return pg(body)
 
 
 def s_idea():
@@ -164,9 +162,9 @@ def s_idea():
         + spacer(30)
         + card(art, CARD_L, "36px 40px")
         + GROW + tip("التيراكوتا في الشعار للوصلة وحدها، لتلفت العين.", "التفصيل")
-        + spacer(34) + bottom(arrow=WH)
+        + spacer(34) + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:110px;top:206px", 230, 72, -12), ("left:300px;top:300px", 110, 42, -12)])
+    return pg(body)
 
 
 def s_shape():
@@ -190,13 +188,13 @@ def s_shape():
         + spacer(30)
         + card(pair, CARD_D, "34px 44px")
         + GROW + tip("السُّمك الثابت يبقى واضحاً حتى على قلم.", "لماذا")
-        + spacer(34) + bottom(arrow=WH)
+        + spacer(34) + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:360px;top:66px", 210, 64, -8), ("left:600px;top:96px", 96, 36, -8)])
+    return pg(body)
 
 
 COLORS = [(DK, CH, "فحمي", "القاعدة والكتابة"), (CH, DK, "حليبي", "الورق والمساحات"),
-          (TE, DK, "تيراكوتا", "الوصلة، أي الحل"), (TL, CH, "أخضر مزرق", "الكبسولات والهدوء"),
+          (TE, DK, "تيراكوتا", "الوصلة، أي الحل"), (TL, CH, "أخضر مزرق", "لمسة هادئة"),
           (MU, DK, "مسطردي", "لمسة دافئة"), (RO, DK, "وردي مغبر", "الأشكال المساعدة")]
 
 
@@ -215,9 +213,9 @@ def s_colors():
         + h1("ستة ألوان،<br>ولكل لون عمل", 84)
         + spacer(28)
         + f'<div class="z" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">{tiles}</div>'
-        + GROW + bottom(arrow=WH)
+        + GROW + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:96px;top:196px", 230, 72, -12), ("left:270px;top:292px", 110, 42, -12)])
+    return pg(body)
 
 
 def s_sizes():
@@ -236,9 +234,9 @@ def s_sizes():
         + spacer(30)
         + card(rows, CARD_D, "16px 50px")
         + GROW + tip("الشعار يظهر كاملاً دائماً، لا تقطعه حافة.", "القاعدة")
-        + spacer(34) + bottom(arrow=WH)
+        + spacer(34) + bottom(arrow=DK)
     )
-    return pg(body, teal=[("left:110px;top:206px", 230, 72, -12), ("left:290px;top:300px", 110, 42, -12)])
+    return pg(body)
 
 
 def closing():
@@ -254,12 +252,11 @@ def closing():
           f'<div style="font-size:{SMALL}px;font-weight:800;margin-bottom:8px;color:{TE}">الحلقة 2</div>'
           '<div style="font-size:56px;font-weight:800;line-height:1.3">الهوية على أرض الواقع</div></div>'
         + spacer(30)
-        + lead("احفظ المنشور، وأرسله لصاحب مشروع جديد.", 42, 700, WH)
+        + lead("احفظ المنشور، وأرسله لصاحب مشروع جديد.", 42, 700, DK)
         + spacer(36)
         + bottom(right_html=mono(260))
     )
-    return pg(body, teal=[("left:150px;top:690px", 260, 80, -10), ("left:450px;top:780px", 120, 44, -10),
-                          ("right:-130px;top:740px", 240, 76, 10)])
+    return pg(body)
 
 
 SLIDES = [cover(), s_goals(), s_idea(), s_shape(), s_colors(), s_sizes(), closing()]
