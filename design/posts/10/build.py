@@ -1,6 +1,8 @@
 """Post 10: carousel «أعمالنا» الحلقة 1 — كيف صمّمنا شعار SHWANI. 7 slides.
 
-Row 4: terracotta base (#E07A47) with charcoal text. Marwa, 19 Oct 2026:
+Row 4: terracotta base (#E07A47) with milky/white text (Marwa, 19 Oct 2026: changed from charcoal
+to white and its derivatives on the orange background). Also per Marwa, 19 Oct: no price is
+mentioned in any post, so the closing slide's price line was removed.
 - the identity is the word SHWANI only: no SH monogram, no lone H, no H pattern. Every slide that
   talks about the link shows the whole word, with the link marked inside it.
 - no logo or word is cut at the slide edge; check_marks() below fails the build if one is.
@@ -13,8 +15,8 @@ from common import *  # noqa: F401,F403
 from rounded import shwani, lockup  # noqa: E402
 
 ROW_BG = TE
-INK = DK                       # text on terracotta
-DIM = "rgba(32,33,38,.72)"
+INK = CH                       # text on terracotta: now milky/white (Marwa, 19 Oct)
+DIM = "rgba(242,233,216,.72)"
 CARD_D = DK                    # charcoal card, milky text
 CARD_L = CH                    # milky card, charcoal text
 N = 7
@@ -58,7 +60,7 @@ def num(k, size=60, bg=DK, fg=CH):
 
 
 def tip(text, label="الفكرة"):
-    return (f'<div class="z" style="border:3px solid {DK};border-radius:32px;padding:26px 34px;display:flex;gap:22px;align-items:center">'
+    return (f'<div class="z" style="border:3px solid {CH};border-radius:32px;padding:26px 34px;display:flex;gap:22px;align-items:center">'
             f'<span style="flex-shrink:0;font-size:30px;font-weight:800;background:{DK};color:{CH};border-radius:24px;padding:6px 20px">{label}</span>'
             f'<span style="flex:1;font-size:32px;font-weight:500;line-height:1.55;text-wrap:balance">{text}</span></div>')
 
@@ -79,7 +81,7 @@ def cover():
         + '<h1 style="font-size:96px;line-height:1.2">كيف صمّمنا<br>شعار <span class="ltr">SHWANI</span>؟</h1>'
         + spacer(26)
         + '<p style="font-size:34px;line-height:1.7">قصة هويتنا، من الفكرة إلى الشعار.</p>'
-        + spacer(70) + bottom(arrow=DK)
+        + spacer(70) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -104,7 +106,7 @@ def s_goals():
         + spacer(30)
         + f'<div class="z">{rows}</div>'
         + GROW + tip("نبدأ دائماً بسؤال: ماذا يجب أن يقول الشعار؟ ثم نرسم.", "طريقتنا")
-        + spacer(44) + bottom(arrow=DK)
+        + spacer(44) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -138,7 +140,7 @@ def s_idea():
         + spacer(44)
         + card(art, CARD_L, "40px 40px")
         + GROW + tip("لون التيراكوتا في الشعار كله لهذه الوصلة وحدها، فتلفت العين إليها.", "التفصيل")
-        + spacer(44) + bottom(arrow=DK)
+        + spacer(44) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -164,7 +166,7 @@ def s_shape():
         + spacer(44)
         + card(pair, CARD_D, "38px 44px")
         + GROW + tip("السُّمك الثابت يبقى واضحاً حتى حين يصغر الشعار على قلم أو ختم.", "لماذا")
-        + spacer(44) + bottom(arrow=DK)
+        + spacer(44) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -191,7 +193,7 @@ def s_colors():
         + f'<div class="z" style="display:flex;flex-direction:column;gap:16px">{rows}</div>'
         + GROW
         + '<p style="font-size:32px;font-weight:500;line-height:1.6">ولكل خدمة لون في منشوراتنا: هذا الصف بلون الهوية البصرية.</p>'
-        + spacer(44) + bottom(arrow=DK)
+        + spacer(44) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -213,7 +215,7 @@ def s_sizes():
         + spacer(36)
         + card(rows, CARD_D, "20px 52px")
         + GROW + tip("الشعار يظهر كاملاً دائماً، لا تقطعه حافة ولا يُختصر إلى حرف.", "القاعدة")
-        + spacer(44) + bottom(arrow=DK)
+        + spacer(44) + bottom(arrow=CH)
     )
     return pg(body)
 
@@ -227,9 +229,6 @@ def closing():
         + '<h1 style="font-size:76px;line-height:1.35">تريد هوية<br>تحكي مشروعك؟</h1>'
         + spacer(24)
         + '<p style="font-size:36px;line-height:1.6">نبدأ معك بالسؤال نفسه: ماذا يجب أن يقول شعارك؟</p>'
-        + spacer(18)
-        + '<p style="font-size:32px;font-weight:500;line-height:1.6;color:rgba(32,33,38,.8)">'
-          'الهوية الكاملة للشركات من <span class="ltr">250,000</span> دينار.<br>والشعار وحده من <span class="ltr">25,000</span> دينار.</p>'
         + GROW
         + f'<div class="z" style="background:{DK};color:{CH};border-radius:36px;padding:38px 44px">'
           f'<div style="font-size:30px;font-weight:700;margin-bottom:10px;color:{TE}">الحلقة 2</div>'
@@ -237,7 +236,7 @@ def closing():
         + spacer(34)
         + '<p style="font-size:32px;font-weight:600;line-height:1.6">احفظ المنشور، وأرسله لصاحب مشروع جديد.</p>'
         + spacer(44)
-        + bottom(right_html=mono(250))
+        + bottom(right_html=mono(250, CH))
     )
     return pg(body)
 
