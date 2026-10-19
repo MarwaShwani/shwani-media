@@ -98,8 +98,8 @@ def stamp(ink=DK):
     R = 200  # svg units, 1 mm = 10 units
     top = "SHWANI  COMPANY"
     bottom = "استوديو تصميم وخدمات تقنية · العراق"
-    W, body_sh = mark(ink, ink)
-    k = 128 / W
+    sw = shwani(ink, ink); W, body_sh = sw.width(), sw.svg()   # SHWANI word, no SH (19 Oct)
+    k = 168 / W
     shg = f'<g transform="translate({200 - W*k/2:.1f} {200 + 700*k/2:.1f}) scale({k:.4f})">{body_sh}</g>'
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" style="width:40mm;height:40mm;display:block">
 <defs><path id="t" d="M 62 200 A 138 138 0 0 1 338 200"/><path id="b" d="M 44 200 A 156 156 0 0 0 356 200"/></defs>

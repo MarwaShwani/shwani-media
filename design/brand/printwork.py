@@ -134,7 +134,7 @@ def pnum(n, color=GREY2):
 def profile_cover():
     body = (
         f'<div class="abs" style="inset:-3mm;{pattern(26, CH, TE, CH, MU, .09)}"></div>'
-        f'<div class="abs" style="left:-31.5mm;top:31mm">{bridge("170mm", "#2B2C33", TE)}</div>'
+        f'<div class="abs" style="left:14mm;top:92mm">{word("182mm", "#2B2C33", TE)}</div>'
         f'<div class="abs" style="right:14mm;top:13.5mm">{chip("الملف التعريفي · <span class=en>2026</span>", CH, "2.5mm")}</div>'
         + dot("10mm", RO, "left:116.5mm;top:24.5mm") + pill("40mm", "12.5mm", MU, "left:171mm;top:23.3mm")
         + f'<div class="abs" style="right:14mm;top:203mm">{logo("68mm", CH, TE)}</div>'

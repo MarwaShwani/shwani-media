@@ -66,7 +66,7 @@ def bullet_list(items, color=TE, size="3.8mm"):
 
 def p01_cover():
     body = (f'<div class="abs" style="inset:-3mm;{pattern(22, CH, TE, CH, MU, .09)}"></div>'
-            f'<div class="abs" style="left:-30mm;top:30mm">{bridge("160mm", "#2B2C33", TE)}</div>'
+            f'<div class="abs" style="left:28mm;top:62mm">{word("241mm", "#2B2C33", TE)}</div>'
             + dot("12mm", RO, "left:228mm;top:24mm") + pill("44mm", "13mm", MU, "left:256mm;top:23.5mm")
             + f'<div class="abs" style="right:20mm;top:84mm">{logo("96mm", CH, TE)}</div>'
             f'<div class="abs" style="right:20mm;top:140mm;text-align:right;color:{CH}">'
@@ -97,7 +97,7 @@ def p02_contents():
         f'<span style="font-size:3.1mm;color:{GREY};flex:1">{d}</span>'
         f'<span class="en" style="font-size:3.2mm;color:{GREY}">{pg:02d}</span></div>' for num, t, d, pg in SECTIONS)
     page(2, "المحتويات", "ماذا في هذا الدليل", area(rows, top=44, right=16, left=60)
-         + f'<div class="abs" style="left:16mm;top:52mm;width:34mm">{bridge("40mm", DK, TE)}</div>'
+         + f'<div class="abs" style="left:16mm;top:52mm;width:34mm">{word("34mm", DK, TE)}</div>'
          + f'<div class="abs" style="left:16mm;top:104mm;width:36mm;font-size:2.9mm;line-height:1.8;color:#55565C;text-align:right">'
            f'هذا الدليل مرجع كل من يصمّم أو يكتب أو يطبع باسم <span class="en">SHWANI COMPANY</span>. اتبعه حتى تبقى العلامة واحدة في كل مكان.</div>')
 
@@ -111,14 +111,14 @@ def p03_about():
         f'<div style="font-size:12mm;font-weight:800;line-height:1.25;color:{DK}">نبني الجسر<br>بين فكرتك والنتيجة</div>'
         + p('<span class="en">SHWANI COMPANY</span> استوديو تصميم وخدمات تقنية في العراق. نصمّم الهوية البصرية للشركات والأفراد، ونكتب السِّيَر الذاتية، '
             'ونساعد في المشاريع التقنية والأكاديمية. كل عمل خاص بصاحبه، من الصفر، بلا قوالب جاهزة.', "3.4mm", "#45464C", "6mm")
-        + f'<div style="margin-top:8mm">{grid(cells, 4)}</div>' + mock("05-storefront", "width:100%;height:52mm;border-radius:4mm;margin-top:7mm;object-position:center 12%"), top=36, left=16, right=16)
+        + f'<div style="margin-top:8mm">{grid(cells, 4)}</div>' + mock("13-outdoor-banner", "width:100%;height:52mm;border-radius:4mm;margin-top:7mm"), top=36, left=16, right=16)
     page(3, "01 · العلامة", "من نحن", body)
 
 
 def p04_story():
     lab = f'font-size:3.4mm;font-weight:600'
     body = (f'<div class="abs" style="left:24mm;top:46mm;width:110mm;height:120mm;background:{DK};border-radius:6mm;display:flex;'
-            f'flex-direction:column;align-items:center;justify-content:center;gap:8mm">{bridge("62mm", CH, TE)}'
+            f'flex-direction:column;align-items:center;justify-content:center;gap:8mm">{word("62mm", CH, TE)}'
             f'<div style="width:62mm;display:flex;justify-content:space-between;color:{CH};{lab}"><span>المشكلة</span>'
             f'<span style="color:{TE}">الحل</span><span>النتيجة</span></div></div>'
             + area(f'<div style="font-size:6.5mm;font-weight:800;line-height:1.35">في قلب اسمنا جسر</div>'
@@ -155,8 +155,8 @@ def p06_versions():
     cells = [
         tile(logo("70mm", DK, TE), CH, "الرئيسي على الحليبي", note="الاستعمال الأول في كل مكان"),
         tile(logo("70mm", CH, TE), DK, "المعكوس على الفحمي", note="الخلفيات الداكنة والصور"),
-        tile(sh("26mm", DK, TE), WHITE, "الرمز المختصر SH", note="صورة الحساب، الأختام، المساحات الصغيرة"),
-        tile(bridge("30mm", CH, TE), DK, "رمز الجسر", note="عنصر زخرفي وختم، لا يحل محل الشعار"),
+        tile(word("52mm", DK, TE), WHITE, "كلمة SHWANI وحدها", note="المساحات الصغيرة والعريضة، بلا COMPANY"),
+        tile(word("52mm", CH, TE), DK, "الكلمة على الفحمي", note="الأختام والأيقونات والمطبوعات الصغيرة"),
         tile(logo("70mm", "#000000", "#000000"), WHITE, "أحادي أسود", note="الفاكس والأختام والحفر"),
         tile(logo("70mm", "#FFFFFF", "#FFFFFF"), "#55565C", "أحادي أبيض", note="الحفر على المعدن والزجاج"),
     ]
@@ -181,7 +181,7 @@ def p07_space():
             + area(f'<div style="font-size:4.4mm;font-weight:700">المساحة الآمنة</div>'
                    + p('تُترك حول الشعار مساحة فارغة لا تقل عن ارتفاع حروف <span class="en">COMPANY</span> (المربعات الزرقاء)، لا يدخلها نص ولا صورة ولا حافة الورقة.', "3.2mm", "#45464C", "2mm")
                    + f'<div style="font-size:4.4mm;font-weight:700;margin-top:8mm">الحجم الأصغر</div>'
-                   + p('أصغر من ذلك تضيع حروف <span class="en">COMPANY</span>؛ عندها يُستعمل الرمز <span class="en">SH</span>.', "3.2mm", "#45464C", "2mm")
+                   + p('أصغر من ذلك تضيع حروف <span class="en">COMPANY</span>؛ عندها تُستعمل كلمة <span class="en">SHWANI</span> وحدها.', "3.2mm", "#45464C", "2mm")
                    + sizes, top=48, left=178, right=16))
     page(7, "02 · الشعار", "المساحة الآمنة والحجم الأصغر", body)
 
@@ -280,14 +280,14 @@ def p13_elements():
              + pill("36mm", "9mm", RO, "right:-4mm;top:28mm") + dot("16mm", SL, "right:18mm;top:-4mm")
              + pill("22mm", "6mm", SG, "left:20mm;top:38mm") + '</div>')
     big = (f'<div style="height:100mm;border-radius:4mm;background:{DK};position:relative;overflow:hidden">'
-           f'<div class="abs" style="left:-14mm;top:-6mm">{bridge("70mm", "#2B2C33", TE)}</div>'
+           f'<div class="abs" style="left:6mm;top:12mm">{word("68mm", "#2B2C33", TE)}</div>'
            f'<div class="abs" style="right:6mm;bottom:6mm">{logo("30mm", CH, TE)}</div></div>')
     cells = [f'<div>{pills}<div style="font-size:3.2mm;font-weight:700;margin-top:2.5mm">الجسور والدوائر</div>'
              f'<div style="font-size:2.8mm;color:{GREY};line-height:1.6">كبسولات بأطراف مستديرة تدخل من حافة الصفحة، ودائرة صغيرة بعدها. واحدة أو اثنتان في التصميم.</div></div>',
-             f'<div>{pt}<div style="font-size:3.2mm;font-weight:700;margin-top:2.5mm">نمط الجسور</div>'
-             f'<div style="font-size:2.8mm;color:{GREY};line-height:1.6">حروف <span class="en">H</span> صغيرة ونقاط، بشفافية 8 إلى 15%، على الفحمي فقط.</div></div>',
-             f'<div>{big}<div style="font-size:3.2mm;font-weight:700;margin-top:2.5mm">الجسر الكبير</div>'
-             f'<div style="font-size:2.8mm;color:{GREY};line-height:1.6">حرف <span class="en">H</span> ضخم بلون أفتح قليلاً من الخلفية، تقطعه حافة الصفحة، ووصلته تيراكوتا.</div></div>']
+             f'<div>{pt}<div style="font-size:3.2mm;font-weight:700;margin-top:2.5mm">نمط الكبسولات</div>'
+             f'<div style="font-size:2.8mm;color:{GREY};line-height:1.6">كبسولات صغيرة ونقاط، بشفافية 8 إلى 15%، على الفحمي فقط. بلا حروف.</div></div>',
+             f'<div>{big}<div style="font-size:3.2mm;font-weight:700;margin-top:2.5mm">الكلمة الكبيرة</div>'
+             f'<div style="font-size:2.8mm;color:{GREY};line-height:1.6">كلمة <span class="en">SHWANI</span> كبيرة بلون أفتح قليلاً من الخلفية، كاملة داخل الصفحة لا تقطعها الحافة.</div></div>']
     page(13, "05 · العناصر", "العناصر الجرافيكية", area(grid(cells, 3, "7mm"), top=40))
 
 
@@ -302,7 +302,7 @@ def p14_icons():
 
 
 def p15_photo():
-    shots = [("01-business-cards", "ضوء نهار طبيعي من نافذة"), ("05-storefront", "أماكن عراقية حقيقية"), ("11-tote", "منتجات في الاستعمال اليومي")]
+    shots = [("01-business-cards", "ضوء نهار طبيعي من نافذة"), ("13-outdoor-banner", "أماكن عراقية حقيقية"), ("11-tote", "منتجات في الاستعمال اليومي")]
     cells = [f'<div>{mock(n, "width:100%;height:96mm;border-radius:4mm")}<div style="font-size:3mm;font-weight:600;margin-top:2mm">{t}</div></div>' for n, t in shots]
     body = area(grid(cells, 3, "6mm") + f'<div style="margin-top:6mm;display:grid;grid-template-columns:1fr 1fr;gap:8mm">'
                 f'<div>{bullet_list(["صور هادئة دافئة، بألوان طبيعية قريبة من ألوان الهوية", "أيدٍ تعمل، أوراق، مكاتب، أماكن من العراق", "مساحة فارغة حول الموضوع لوضع النص"], SG)}</div>'
@@ -322,12 +322,12 @@ def p16_stationery():
 
 def p17_print():
     gallery(17, "06 · التطبيقات", "المطبوعات", [("07-company-profile", "الملف التعريفي، 8 صفحات"), ("06-brochure", "البروشور الثلاثي"),
-                                                  ("03-flyer", "فلاير A5")], cols=3, h="128mm")
+                                                  ("03-flyer", "فلاير A5")], cols=2, h="128mm")
 
 
 def p18_signage():
-    gallery(18, "06 · التطبيقات", "اللافتات", [("05-storefront", "لافتة واجهة المحل (300×90 سم)"), ("13-outdoor-banner", "بنر خارجي (300×100 سم)"),
-                                                ("04-rollup", "رول أب (85×200 سم)")], cols=3, h="128mm")
+    gallery(18, "06 · التطبيقات", "اللافتات", [("13-outdoor-banner", "بنر خارجي (300×100 سم)"),
+                                                ("04-rollup", "رول أب (85×200 سم)")], cols=2, h="128mm")
 
 
 def p19_merch():
@@ -369,7 +369,7 @@ def p22_social():
                  + f'<div style="margin-right:3mm"><div style="font-size:3mm;font-weight:700">{t}</div><div style="font-size:2.6mm;color:{GREY}">{d}</div></div></div>'
                  for b, f, t, d in rows)
     specs = bullet_list(["المنشور والكاروسيل: 1080×1350", "الريل والستوري: 1080×1920، والمحتوى المهم بين 260 و1480 بكسل من الأعلى",
-                         "غلاف الريل بتصميم غلاف الكاروسيل في صفّه", "شعار SHWANI الكامل في كل منشور، والرمز SH لصورة الحساب فقط",
+                         "غلاف الريل بتصميم غلاف الكاروسيل في صفّه", "شعار SHWANI الكامل في كل منشور، ولا رمز SH ولا حرف H وحده",
                          "الخط في الشرائح 30 بكسل فأكثر، وفي الريلز 34 فأكثر"], MU)
     hl = "".join(flat(f"highlight-{i}", "width:16mm;height:16mm;border-radius:50%;object-fit:cover;object-position:center") for i in range(1, 8))
     body = area(f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12mm;direction:rtl">'
@@ -410,7 +410,7 @@ def p24_growth():
 
 
 def p25_files():
-    groups = [("الشعار", ["SVG وPNG شفاف: الرئيسي، المعكوس، الرمز SH، رمز الجسر، أسود، أبيض", "صورة الحساب 1080×1080"]),
+    groups = [("الشعار", ["SVG وPNG شفاف: الرئيسي، المعكوس، كلمة SHWANI وحدها، أسود، أبيض", "صورة الحساب 1080×1080"]),
               ("ملفات الطباعة PDF (بنزف 3 مم)", ["بطاقة العمل، الورقة الرسمية، عرض السعر، الظرف، الملف، بطاقة التعريف",
                                                  "الفلاير، البروشور، الملف التعريفي 8 صفحات", "الرول أب واللافتة والبنر بمقياس 1:10",
                                                  "الدفتر، الكوب، التيشيرت، الحقيبة، القلم، الملصقات، العلبة، الكيس، الختم"]),

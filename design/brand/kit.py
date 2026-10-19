@@ -5,7 +5,7 @@ Every piece is an HTML page at its trim size in mm. render() writes
   out/png/<name>.png    trim-size PNG at 300 dpi (for mockups and the brand book)
 Elements that touch an edge are drawn 3 mm past it (class .bleed-*), so the PDF bleed is real.
 """
-import os, sys, asyncio, base64, math
+import os, sys, asyncio, base64, math, re
 
 BRAND = os.path.dirname(os.path.abspath(__file__))
 DESIGN = os.path.dirname(BRAND)
@@ -72,55 +72,65 @@ OTHER_LINE = "أخبرنا بما تحتاجه، نراجع إمكانية تن�
 
 # ---------------------------------------------------------------- logo
 
+def _unit(v):
+    m = re.match(r"^([0-9.]+)([a-z%]*)$", str(v).strip())
+    return float(m.group(1)), m.group(2) or "px"
+
+
+def _word_svg(height, color, bar, style="", pad=0):
+    """SHWANI word (no COMPANY) at a given height. class wm: checked to stay inside the trim."""
+    s = shwani(color, bar)
+    W = s.width()
+    return (f'<svg class="wm" xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-700-pad} {W+2*pad:.0f} {700+2*pad}" '
+            f'style="height:{height};width:auto;display:block;overflow:visible;{style}">{s.svg()}</svg>')
+
+
 def logo(width, color=DK, bar=TE, word=None, cls="", style=""):
     """Full SHWANI COMPANY lockup as inline SVG, width in any CSS unit."""
     svg = lockup(color, bar, word or color)
-    return svg.replace('<svg ', f'<svg class="{cls}" style="width:{width};height:auto;display:block;{style}" ', 1) \
+    return svg.replace('<svg ', f'<svg class="wm {cls}" style="width:{width};height:auto;display:block;{style}" ', 1) \
               .replace(' width="', ' data-w="', 1).replace(' height="1180"', '', 1)
+
+
+def word(width, color=DK, bar=TE, style=""):
+    """SHWANI word sized by width (any CSS unit)."""
+    v, u = _unit(width)
+    return _word_svg(f"{v * 700 / _W_WORD:.3f}{u}", color, bar, style)
 
 
 def logo_wide(height, color=DK, bar=TE):
     """SHWANI word alone (no COMPANY), for very wide signs."""
-    s = shwani(color, bar)
-    W = s.width()
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -730 {W+60:.0f} 760" '
-            f'style="height:{height};width:auto;display:block">{s.svg()}</svg>')
+    return _word_svg(height, color, bar)
+
+
+# Marwa, 19 Oct: the identity is the word SHWANI only. No SH monogram, no lone H, no H pattern.
+# sh() and bridge() keep their old names and footprint (same width as the old glyph at that height)
+# but now draw the SHWANI word, so every piece that used them switches at once.
+_W_SH = mark(CH, TE)[0]
+_W_H = 430 + 160
+_W_WORD = shwani(CH, TE).width()
 
 
 def sh(height, color=CH, bar=TE, style="", pad=0):
-    W, body = mark(color, bar)
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-700-pad} {W+2*pad:.0f} {700+2*pad}" '
-            f'style="height:{height};width:auto;display:block;{style}">{body}</svg>')
+    v, u = _unit(height)
+    return _word_svg(f"{v * _W_SH / _W_WORD:.3f}{u}", color, bar, style, pad)
 
 
 def bridge(height, color=CH, bar=TE, style="", pad=0):
-    """The H alone: two stems (problem, result) and the terracotta bridge (solution). pad=0: box is the glyph."""
-    w = Word(H=700, sw=160, gap=0)
-    w.H_(430, color, bar, 130)
-    W = w.width()
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-700-pad} {W+2*pad:.0f} {700+2*pad}" '
-            f'style="height:{height};width:auto;display:block;{style}">{w.svg()}</svg>')
-
-
-def bridge_svg_raw(color, bar, k=1.0):
-    w = Word(H=700, sw=160, gap=0)
-    w.H_(430, color, bar, 130)
-    return w.width(), w.svg()
+    v, u = _unit(height)
+    return _word_svg(f"{v * _W_H / _W_WORD:.3f}{u}", color, bar, style, pad)
 
 
 # ---------------------------------------------------------------- pattern
 
 def pattern(cell=16, stem=CH, bar=TE, dot=CH, dot2=MU, op=.10, scale=.42):
-    """Half-drop grid of small H bridges and dots, as a CSS background-image value.
-    cell is the repeat in mm. Returns css for background-image and background-size."""
-    W, body = bridge_svg_raw(stem, bar)
-    # one tile 200x200 units: H at (0,0) and (100,100), dots at (100,0) and (0,100)
-    k = scale * 100 / 700
-    hw = W * k
-    def h_at(x, y):
-        return f'<g transform="translate({x - hw/2:.2f} {y + 35:.2f}) scale({k:.4f})">{body}</g>'
+    """Half-drop grid of small rounded bars (the terracotta link of SHWANI) and dots, as CSS background.
+    No letters, so nothing reads as a cut word at the edges. cell is the repeat in mm."""
+    L, T = 44 * scale / .42, 13 * scale / .42
+    def bar_at(x, y, c):
+        return f'<rect x="{x - L/2:.1f}" y="{y - T/2:.1f}" width="{L:.1f}" height="{T:.1f}" rx="{T/2:.1f}" fill="{c}"/>'
     tile = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">'
-            f'<g opacity="{op}">{h_at(50, 50)}{h_at(150, 150)}'
+            f'<g opacity="{op}">{bar_at(50, 50, bar)}{bar_at(150, 150, stem)}'
             f'<circle cx="150" cy="50" r="5" fill="{dot}"/><circle cx="50" cy="150" r="5" fill="{dot2}"/></g></svg>')
     uri = "data:image/svg+xml;base64," + base64.b64encode(tile.encode()).decode()
     return f"background-image:url('{uri}');background-size:{cell}mm {cell}mm;"
@@ -181,11 +191,11 @@ def contact(size="3mm", color=DK, dim=GREY, accent=TE, gap="1.6mm", place=False,
 
 
 def pill(w, h, color=TE, style=""):
-    return f'<div style="position:absolute;width:{w};height:{h};border-radius:{h};background:{color};{style}"></div>'
+    return f'<div class="deco" style="position:absolute;width:{w};height:{h};border-radius:{h};background:{color};{style}"></div>'
 
 
 def dot(d, color=MU, style=""):
-    return f'<div style="position:absolute;width:{d};height:{d};border-radius:50%;background:{color};{style}"></div>'
+    return f'<div class="deco" style="position:absolute;width:{d};height:{d};border-radius:50%;background:{color};{style}"></div>'
 
 
 # ---------------------------------------------------------------- page + render
@@ -221,6 +231,21 @@ class Piece:
 <body class="{'bleedmode' if bleed else ''}"><div class="sheet"><div class="page">{self.body}</div></div></body></html>"""
 
 
+SAFE_MM = 1.5   # every logo stays at least this far inside the trim
+PROBLEMS = []
+CHECK_JS = """(m) => { const P = document.querySelector('.page').getBoundingClientRect(); const out = [];
+  document.querySelectorAll('svg.wm').forEach((e, i) => { const r = e.getBoundingClientRect();
+    if (r.width < 1) return;
+    const d = [r.left - P.left, P.right - r.right, r.top - P.top, P.bottom - r.bottom].map(v => v / 3.7795);
+    if (Math.min(...d) < m / 3.7795) out.push('logo ' + i + ' inside margins mm (L,R,T,B) = ' + d.map(v => v.toFixed(1)).join(', '));
+  });
+  const W = [...document.querySelectorAll('svg.wm')].map(e => e.getBoundingClientRect()).filter(r => r.width > 1);
+  document.querySelectorAll('.deco').forEach((e, i) => { const r = e.getBoundingClientRect();
+    W.forEach((w, j) => { if (r.left < w.right && r.right > w.left && r.top < w.bottom && r.bottom > w.top)
+      out.push('shape ' + i + ' overlaps logo ' + j); }); });
+  return out; }"""
+
+
 async def _render(pieces, pdf=True, png=True, dpi=300, outdir=None):
     from playwright.async_api import async_playwright
     outdir = outdir or OUT
@@ -239,6 +264,9 @@ async def _render(pieces, pdf=True, png=True, dpi=300, outdir=None):
                 await pg.goto("file://" + src)
                 await pg.evaluate("document.fonts.ready")
                 await pg.wait_for_timeout(200)
+                bad = await pg.evaluate(CHECK_JS, SAFE_MM * 96 / 25.4)
+                for r in bad:
+                    PROBLEMS.append(f"{pc.name}: {r}")
                 await pg.screenshot(path=os.path.join(outdir, "png", pc.name + ".png"),
                                     clip={"x": 0, "y": 0, "width": pxw, "height": pxh},
                                     omit_background=(pc.bg == "transparent"))
@@ -260,3 +288,9 @@ async def _render(pieces, pdf=True, png=True, dpi=300, outdir=None):
 
 def render(pieces, **kw):
     asyncio.run(_render(pieces, **kw))
+    if PROBLEMS:
+        print("\nMEASUREMENT CHECK FAILED (logo cut or too close to the edge):")
+        for p in PROBLEMS:
+            print("  ", p)
+        sys.exit(1)
+    print("measurement check: all logos inside the trim")

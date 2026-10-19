@@ -10,7 +10,7 @@ W, H, FPS = 1920, 1080, 30
 DK, CH, TE = (32, 33, 38), (242, 233, 216), (224, 122, 71)
 FONT = os.path.join(os.path.dirname(HERE), "node_modules", "@fontsource", "alexandria", "files")
 
-MOCKS = ["05-storefront", "01-business-cards", "02-stationery", "07-company-profile", "04-rollup", "12-tshirts",
+MOCKS = ["01-business-cards", "02-stationery", "07-company-profile", "04-rollup", "12-tshirts",
          "14-mugs", "09-packaging", "13-outdoor-banner", "10-screens"]
 
 
@@ -53,7 +53,7 @@ def render_text_png(html, path, w, h):
 def main():
     tmp = os.path.join(OUT, "film")
     os.makedirs(tmp, exist_ok=True)
-    bridge = load("shwani-bridge-symbol-cream", 300)
+    bridge = load("shwani-word-cream", 640)
     logo = load("shwani-logo-cream", 900)
     tag = render_text_png(f'<div style="width:1920px;text-align:center;color:rgb{CH};font-size:54px;font-weight:700">نبني الجسر بين فكرتك والنتيجة</div>',
                           os.path.join(tmp, "tag.png"), 1920, 90)

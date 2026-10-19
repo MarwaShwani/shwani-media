@@ -18,8 +18,8 @@ def card_front():
 
 def card_back():
     body = (
-        f'<div class="abs" style="left:-2.8mm;top:12.3mm">{bridge("25.4mm", DK, TE)}</div>'
-        + dot("3.4mm", RO, "left:24.1mm;top:6.1mm")
+        f'<div class="abs" style="left:6.6mm;top:6.6mm">{word("27mm", DK, TE)}</div>'
+        + dot("3.4mm", RO, "left:6.6mm;top:40mm")
         + f'''<div class="abs" style="right:6.6mm;top:5.9mm;text-align:right">
   <div style="font-size:4.3mm;font-weight:700;line-height:1.3">{OWNER_AR}</div>
   <div style="font-size:2.6mm;font-weight:500;color:{TE};line-height:1.5">{ROLE_AR}</div>
@@ -163,7 +163,7 @@ def folder():
     stem = "#2B2C33"
     body = (
         f'<div class="abs" style="inset:-3mm;{pattern(30, CH, TE, CH, MU, .09)}"></div>'
-        f'<div class="abs" style="left:-19.7mm;top:49.6mm">{bridge("150mm", stem, TE)}</div>'
+        f'<div class="abs" style="left:22.5mm;right:22.5mm;top:96mm">{word("185mm", stem, TE)}</div>'
         + dot("12.9mm", RO, "left:159mm;top:41.4mm")
         + pill("56mm", "15.8mm", MU, "left:180.1mm;top:40mm")
         + f'<div class="abs" style="right:22.5mm;top:230mm">{logo("77mm", CH, TE)}</div>'

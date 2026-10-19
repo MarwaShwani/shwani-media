@@ -43,9 +43,7 @@ MOCKUPS = {
     "04-rollup": ("rollup-hall-blank.jpg", [
         ("rollup-85x200cm-scale-1-10", Q([(528.8, 342.4), (1221.7, 323.1), (1204.2, 2012.9), (514.3, 2008.7)]), {}),
     ]),
-    "05-storefront": ("storefront-blank.jpg", [
-        ("shop-sign-300x90cm-scale-1-10", Q([(634.5, 219.5), (1928.0, 224.0), (1929.0, 583.0), (634.5, 578.5)]), {}),
-    ]),
+    # "05-storefront" removed: Marwa, 19 Oct, no outside-office photo in any design
     "06-brochure": ("brochure-blank.jpg", [
         ("mock-brochure-inside-245", Q([(627.7, 225.8), (1138, 245), (1113, 1479), (633.2, 1467.7)]), {"crop": (0, 0, 1/3, 1)}),
         ("mock-brochure-inside-245", Q([(1138, 245), (1645, 257), (1630, 1490), (1113, 1479)]), {"crop": (1/3, 0, 2/3, 1)}),

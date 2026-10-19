@@ -13,14 +13,19 @@ def bridge_svg(color, bar, pad=30):
             f'width="{W+2*pad:.0f}" height="{700+2*pad}"><title>SHWANI</title>{body}</svg>')
 
 
+def word_svg(color, bar, pad=30):
+    s = shwani(color, bar); W = s.width()
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-700-pad} {W+2*pad:.0f} {700+2*pad}" '
+            f'width="{W+2*pad:.0f}" height="{700+2*pad}"><title>SHWANI</title>{s.svg()}</svg>')
+
+
 def logo_set():
     """name -> svg text"""
     s = {}
     for nm, c, bar, word in [("charcoal", DK, TE, DK), ("cream", CH, TE, CH), ("black", "#000000", "#000000", "#000000"),
                              ("white", "#FFFFFF", "#FFFFFF", "#FFFFFF")]:
         s[f"shwani-logo-{nm}"] = lockup(c, bar, word)
-        s[f"shwani-sh-mark-{nm}"] = mark_svg(c, bar)
-        s[f"shwani-bridge-symbol-{nm}"] = bridge_svg(c, bar)
+        s[f"shwani-word-{nm}"] = word_svg(c, bar)   # 19 Oct: no SH mark, no lone H
     s["shwani-avatar-cream-1080"] = avatar(CH, DK, TE)
     s["shwani-avatar-charcoal-1080"] = avatar(DK, CH, TE)
     return s
