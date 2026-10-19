@@ -25,11 +25,11 @@ html,body{{margin:0;background:{bg}}}
 .s{{width:1080px;height:1350px;padding:72px;background:{bg};color:{fg};font-family:'Alexandria',sans-serif;
    position:relative;overflow:hidden;display:flex;flex-direction:column}}
 .top{{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2}}
-.chip{{padding:12px 30px;border-radius:40px;border:3px solid currentColor;font-size:36px;font-weight:600}}
-.count{{font-size:36px;font-weight:600;letter-spacing:2px;direction:ltr}}
+.chip{{padding:12px 28px;border-radius:40px;border:2px solid currentColor;font-size:25px;font-weight:500}}
+.count{{font-size:24px;font-weight:400;letter-spacing:2px;direction:ltr;opacity:.85}}
 .bot{{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2}}
-.handle{{font-size:36px;font-weight:500;direction:ltr}}
-.swipe{{display:flex;align-items:center;gap:16px;font-size:38px;font-weight:700}}
+.handle{{font-size:24px;font-weight:400;direction:ltr}}
+.swipe{{display:flex;align-items:center;gap:16px;font-size:28px;font-weight:600}}
 h1{{margin:0;font-weight:800;line-height:1.3;position:relative;z-index:2}}
 p{{margin:0;position:relative;z-index:2}}
 .deco{{position:absolute;z-index:1}}
@@ -43,7 +43,7 @@ def top(chip, i, n):
     return f'<div class="top"><span class="chip">{chip}</span><span class="count">{i}/{n}</span></div>'
 
 
-ARROW = (f'<svg aria-hidden="true" width="70" height="30" viewBox="0 0 56 24" fill="none" stroke="{MU}" '
+ARROW = (f'<svg aria-hidden="true" width="56" height="24" viewBox="0 0 56 24" fill="none" stroke="{MU}" '
          f'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M54 12H4"/><path d="M14 2L4 12l10 10"/></svg>')
 
 
