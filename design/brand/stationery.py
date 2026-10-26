@@ -7,12 +7,13 @@ from kit import *  # noqa: F401,F403
 
 def card_front():
     body = (
-        f'<div class="abs" style="left:0;right:0;top:15.6mm;display:flex;justify-content:center">{logo("49.5mm", CH, TE)}</div>'
-        f'<div class="abs" style="left:0;right:0;top:31.6mm;text-align:center;font-size:2.15mm;font-weight:400;color:{CH_DIM}">{LINE_AR}</div>'
-        # 26 Oct (Marwa): nothing on the card is cut at the edge; every shape sits inside the trim
-        + pill("18mm", "6.2mm", TE, "left:6.6mm;top:37.2mm")
-        + dot("4.6mm", MU, "left:27.4mm;top:38mm")
-        + dot("7.4mm", SL, "left:76mm;top:6.6mm")
+        # 26 Oct (Marwa): the line of services sat 2 mm under COMPANY, and on a card seen at an angle it ran into the
+        # letters of COMPANY. The logo moves up and the line gets a clear 6.5 mm gap; nothing touches the edge.
+        f'<div class="abs" style="left:0;right:0;top:11mm;display:flex;justify-content:center">{logo("49.5mm", CH, TE)}</div>'
+        f'<div class="abs" style="left:0;right:0;top:31.2mm;text-align:center;font-size:2.15mm;font-weight:400;color:{CH_DIM}">{LINE_AR}</div>'
+        + pill("16mm", "5.6mm", TE, "left:6.6mm;top:39.2mm")
+        + dot("4.2mm", MU, "left:25mm;top:39.9mm")
+        + dot("7mm", SL, "left:76.4mm;top:5.6mm")
     )
     return Piece("business-card-front", 90, 50, body, bg=DK, fg=CH)
 
