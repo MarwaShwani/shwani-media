@@ -87,9 +87,11 @@ def add_grain(est, shade, wgt, core, offsets=(90, 160, 240, 330, 430)):
 
 def layers_of(spec, old_png):
     """(art, quad, opt) for each layer, with the old artwork, prepared exactly as mockups.build does."""
-    _, layers = spec
+    layers = spec[1]
     out = []
     for a, quad, opt in layers:
+        # a layer whose quad was corrected after delivery: recover with what the delivered mockup used
+        a, quad = opt.get("old_art", a), opt.get("old_quad", quad)
         if isinstance(a, str) and a.startswith("#"):
             img = M.art(a)
         elif isinstance(a, str) and a.startswith("asset:"):
@@ -183,7 +185,29 @@ def recover(name, old_mock_dir, old_png):
         m3 = mf[..., None]
         solved = (mock - out_old * m3) / np.maximum(1 - m3, .15)
         blank[band] = np.clip(solved[band], 0, 255)
+    # corrected quads: the surface around the old quad is real paper; bring the rebuilt part to the same level
+    for (a, img, q, opt), raw in zip(L, spec[1]):
+        if "old_quad" in opt:
+            blank = match_paper(blank, mock, q, np.float32(raw[1]))
     return np.clip(blank, 0, 255).astype(np.uint8)
+
+
+def match_paper(blank, mock, old_q, new_q, ring=25):
+    Hs, Ws = blank.shape[:2]
+    old_m = quad_mask(old_q, (Ws, Hs))
+    new_m = quad_mask(new_q, (Ws, Hs))
+    near_out = (cv2.dilate(old_m.astype(np.uint8), np.ones((2 * ring + 1,) * 2, np.uint8)) > 0) & ~old_m & new_m
+    paper = near_out & (mock.mean(2) > 225)
+    near_in = old_m & (cv2.dilate(paper.astype(np.uint8), np.ones((2 * ring + 1,) * 2, np.uint8)) > 0)
+    near_in &= cv2.erode(old_m.astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
+    if paper.sum() < 200 or near_in.sum() < 200:
+        return blank
+    k = np.median(mock[paper], axis=0) / np.maximum(np.median(blank[near_in], axis=0), 1)
+    region = cv2.erode(old_m.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+    out = blank.copy()
+    out[region] = np.clip(blank[region] * k, 0, 255)
+    print("  paper level matched, x", np.round(k, 3))
+    return out
 
 
 def _fabric(blank, mock, rgba, quad, grow, opt):

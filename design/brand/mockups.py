@@ -28,7 +28,10 @@ def Q(pts, k=1.0):
 # each mockup: scene, list of (artwork, quad, options) painted in order (lowest first)
 MOCKUPS = {
     "01-business-cards": ("cards-wood-blank.jpg", [
-        ("business-card-front", Q([(396.6, 731.3), (1290.9, 375.8), (1601.5, 635.8), (698.4, 987.5)]), {}),
+        # 26 Oct (Marwa): the print did not reach the card's lower-left corner; the quad now follows the whole top
+        # surface of the card (corners measured on the photo), and the card is printed at its true 90 x 50 mm
+        ("business-card-front", Q([(395.3, 730.7), (1290.0, 375.0), (1671.7, 694.5), (744.2, 1092.0)]),
+         {"old_quad": Q([(396.6, 731.3), (1290.9, 375.8), (1601.5, 635.8), (698.4, 987.5)])}),
         ("business-card-back", Q([(1044.1, 872.0), (1903.4, 509.1), (2251.8, 1023.0), (1395.1, 1435.9)]), {}),
     ]),
     "02-stationery": ("stationery-flatlay-blank.jpg", [
