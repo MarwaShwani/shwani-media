@@ -26,14 +26,24 @@ def logo_set():
                              ("white", "#FFFFFF", "#FFFFFF", "#FFFFFF")]:
         s[f"shwani-logo-{nm}"] = lockup(c, bar, word)
         s[f"shwani-word-{nm}"] = word_svg(c, bar)   # 19 Oct: no SH mark, no lone H
-    s["shwani-avatar-cream-1080"] = avatar(CH, DK, TE)
-    s["shwani-avatar-charcoal-1080"] = avatar(DK, CH, TE)
+    # 26 Oct (Marwa): SHWANI everywhere, the profile picture too (no SH)
+    s["shwani-avatar-cream-1080"] = word_avatar(CH, DK, TE)
+    s["shwani-avatar-charcoal-1080"] = word_avatar(DK, CH, TE)
     return s
 
 
+def word_avatar(bg, color, bar, S=1080, width=800):
+    """Profile picture: the SHWANI word centred, well inside the circle Instagram crops."""
+    w = shwani(color, bar); W = w.width()
+    k = width / W
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S} {S}" width="{S}" height="{S}">'
+            f'<rect width="{S}" height="{S}" fill="{bg}"/>'
+            f'<g transform="translate({(S - W*k)/2:.1f} {S/2 + 700*k/2:.1f}) scale({k:.4f})">{w.svg()}</g></svg>')
+
+
 def tile_svg(size=256):
-    W, body = mark(CH, TE)
-    k = size * .5 / W
+    w = shwani(CH, TE); W, body = w.width(), w.svg()
+    k = size * .76 / W
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}" width="{size}" height="{size}">'
             f'<rect width="{size}" height="{size}" rx="{size*.18:.0f}" fill="{DK}"/>'
             f'<g transform="translate({(size - W*k)/2:.1f} {size/2 + 700*k/2:.1f}) scale({k:.4f})">{body}</g></svg>')
@@ -69,7 +79,7 @@ async def write_logos():
     os.makedirs(os.path.join(LOGO, "svg"), exist_ok=True)
     os.makedirs(os.path.join(LOGO, "png"), exist_ok=True)
     items = logo_set()
-    items["shwani-sh-tile-256"] = tile_svg(256)
+    items["shwani-tile-256"] = tile_svg(256)
     async with async_playwright() as p:
         b = await p.chromium.launch()
         pg = await b.new_page()

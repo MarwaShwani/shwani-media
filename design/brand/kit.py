@@ -23,6 +23,9 @@ GREY = "#6E6E73"         # secondary text on white
 GREY2 = "#9A9AA0"        # tertiary text on white
 RULE = "#E4E1DA"         # hairlines on white
 CH_DIM = "rgba(242,233,216,.72)"
+# the big SHWANI watermark on dark covers: letters a shade lighter than charcoal, the link a dim terracotta,
+# so the word reads whole and no bright dash floats on its own (26 Oct)
+WM_STEM, WM_BAR = "#2B2C33", "#4A352D"
 
 # contact (no phone number, by Marwa's rule, 18 Oct)
 EMAIL = "shwanicompany@gmail.com"

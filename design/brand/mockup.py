@@ -166,9 +166,10 @@ def refine_quad(scene, quad, search=10.0, step=.5, angles=1.2, astep=.2, span=(.
     return np.float32(out)
 
 
-def multiply(scene, art, quad, white=None, feather=1.0, inset=0.0, gamma=1.0, strength=1.0, shade_src=None):
+def multiply(scene, art, quad, white=None, feather=1.0, inset=0.0, gamma=1.0, strength=1.0, shade_src=None, keep=None):
     """Mockup on a BLANK white surface: result = art x (surface shading). white = paper colour under neutral light,
-    measured automatically as the 97th percentile of the surface if None."""
+    measured automatically as the 97th percentile of the surface if None.
+    keep: optional float mask in scene pixels (1 = paper, 0 = something in front of it, e.g. a hand)."""
     Hs, Ws = scene.shape[:2]
     quad = np.float32(quad)
     if inset:
@@ -190,6 +191,8 @@ def multiply(scene, art, quad, white=None, feather=1.0, inset=0.0, gamma=1.0, st
         out = sc * (1 - strength) + out * strength
     if feather:
         m = cv2.GaussianBlur(m, (0, 0), feather)
+    if keep is not None:
+        m = m * keep
     m = m[..., None]
     return np.clip(sc * (1 - m) + out * m, 0, 255).astype(np.uint8)
 
@@ -258,3 +261,79 @@ def mug(scene, art, x0, x1, y_top, y_bot, e_top, e_bot, a0, a1, v0=.06, v1=.94, 
     region = res[:, int(x0):int(x1) + 1]
     res[:, int(x0):int(x1) + 1] = region * (1 - m[..., None]) + out * m[..., None]
     return np.clip(res, 0, 255).astype(np.uint8)
+
+
+def metal_fill(scene, art_rgba, quad, opacity=.97, contrast=.55, lo=.55, hi=1.5, feather=.5, shade_src=None,
+               sheen=.18, emboss=.0):
+    """Engraving filled with colour (gold on black lacquer, charcoal on gold metal): the fill keeps the light of the
+    surface under it (contrast < 1 keeps it from going black in the dark parts of a glossy object), with a soft sheen
+    from top to bottom and an optional thin dark edge on the upper side, as a cut does."""
+    Hs, Ws = scene.shape[:2]
+    h, w = art_rgba.shape[:2]
+    Ha = H_from_quad(np.float32(quad), w, h)
+    col = cv2.warpPerspective(art_rgba[:, :, :3], Ha, (Ws, Hs), flags=cv2.INTER_AREA).astype(np.float32)
+    a = cv2.warpPerspective(art_rgba[:, :, 3], Ha, (Ws, Hs), flags=cv2.INTER_AREA).astype(np.float32) / 255
+    src = (scene if shade_src is None else shade_src).astype(np.float32)
+    lum = cv2.GaussianBlur(cv2.cvtColor(src.astype(np.uint8), cv2.COLOR_BGR2GRAY).astype(np.float32), (0, 0), 1.2)
+    region = a > .5
+    ref = np.median(lum[region]) if region.any() else lum.mean()
+    shade = np.clip((lum / max(ref, 1)) ** contrast, lo, hi)
+    if sheen:
+        v = cv2.warpPerspective(np.tile(np.linspace(1 + sheen, 1 - sheen, h, dtype=np.float32)[:, None], (1, w)),
+                                Ha, (Ws, Hs), flags=cv2.INTER_LINEAR, borderValue=1.0)
+        shade = shade * v
+    ink = col * shade[..., None]
+    if feather:
+        a = cv2.GaussianBlur(a, (0, 0), feather)
+    out = scene.astype(np.float32)
+    if emboss:
+        edge = np.clip(np.roll(a, 1, axis=0) - a, 0, 1)
+        out = out * (1 - emboss * edge[..., None])
+    a3 = (a * opacity)[..., None]
+    out = out * (1 - a3) + ink * a3
+    return np.clip(out, 0, 255).astype(np.uint8)
+
+
+def paper_mask(scene, quad, occluder=None, sat_max=70, feather=1.2, grow=2):
+    """1 where the sheet itself shows, 0 over a hand, sleeve, cuff or pen in front of it.
+    occluder: polygon (scene pixels) drawn roughly around what covers the sheet; inside it the sheet is kept only
+    where the pixel looks like paper (low saturation, close to the sheet's own brightness nearby)."""
+    Hs, Ws = scene.shape[:2]
+    keep = np.ones((Hs, Ws), np.float32)
+    if occluder is None:
+        return keep
+    poly = np.zeros((Hs, Ws), np.uint8)
+    cv2.fillPoly(poly, [np.int32(occluder).reshape(-1, 1, 2)], 255)
+    hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV).astype(np.float32)
+    inq = np.zeros((Hs, Ws), np.uint8)
+    cv2.fillPoly(inq, [np.int32(quad).reshape(-1, 1, 2)], 255)
+    paper = (inq > 0) & (poly == 0)
+    vref = cv2.GaussianBlur(np.where(paper, hsv[..., 2], 0), (0, 0), 25) / np.maximum(
+        cv2.GaussianBlur(paper.astype(np.float32), (0, 0), 25), 1e-3)
+    looks = (hsv[..., 1] < sat_max) & (hsv[..., 2] > .55 * vref) & (hsv[..., 2] < 1.15 * vref + 8)
+    cover = (poly > 0) & ~looks
+    cover = cv2.morphologyEx(cover.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+    cover = cv2.dilate(cover, np.ones((2 * grow + 1, 2 * grow + 1), np.uint8))
+    keep = 1 - cv2.GaussianBlur(cover.astype(np.float32), (0, 0), feather)
+    return np.clip(keep, 0, 1)
+
+
+def on_dark(scene, art, quad, shade_src=None, sigma=1.2, feather=1.0, clamp=(.55, 1.7)):
+    """Artwork printed on a dark blank surface (a charcoal notebook cover): the light of the photo is the photo divided
+    by the surface's own colour, so folds, grain and the window light stay; the art's own colours carry the print."""
+    Hs, Ws = scene.shape[:2]
+    h, w = art.shape[:2]
+    Ha = H_from_quad(np.float32(quad), w, h)
+    warped = cv2.warpPerspective(art, Ha, (Ws, Hs), flags=cv2.INTER_AREA if max(w, h) > 1.5 * max(Ws, Hs) else cv2.INTER_LINEAR,
+                                 borderMode=cv2.BORDER_REPLICATE).astype(np.float32)
+    m = cv2.warpPerspective(np.full((h, w), 255, np.uint8), Ha, (Ws, Hs), flags=cv2.INTER_LINEAR).astype(np.float32) / 255
+    src = (scene if shade_src is None else shade_src).astype(np.float32)
+    lum = cv2.GaussianBlur(cv2.cvtColor(src.astype(np.uint8), cv2.COLOR_BGR2GRAY).astype(np.float32), (0, 0), sigma)
+    core = cv2.erode((m > .99).astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
+    ref = np.median(lum[core])
+    L = np.clip(lum / max(ref, 1), *clamp)[..., None]
+    out = warped * L
+    if feather:
+        m = cv2.GaussianBlur(m, (0, 0), feather)
+    m = m[..., None]
+    return np.clip(scene.astype(np.float32) * (1 - m) + out * m, 0, 255).astype(np.uint8)

@@ -114,8 +114,8 @@ def brochure_inside():
     about = (
         f'<div class="abs" style="right:10.1mm;left:10mm;top:16mm;text-align:right">{kicker("من نحن", TE, "2.6mm")}'
         f'<div style="font-size:5.6mm;font-weight:700;line-height:1.3">في قلب اسمنا جسر</div></div>'
-        f'<div class="abs" style="left:0;right:0;top:37.7mm;display:flex;justify-content:center">{bridge("23.8mm", DK, TE)}</div>'
-        f'<div class="abs" style="left:15mm;right:15mm;top:66.5mm;display:flex;justify-content:space-between;font-size:2.6mm;color:{GREY}">'
+        f'<div class="abs" style="left:0;right:0;top:38mm;display:flex;justify-content:center">{word("66mm", DK, TE)}</div>'
+        f'<div class="abs" style="left:18mm;right:18mm;top:55mm;display:flex;justify-content:space-between;font-size:2.6mm;color:{GREY}">'
         f'<span>المشكلة</span><span style="color:{TE};font-weight:600">الحل</span><span>النتيجة</span></div>'
         f'<div class="abs" style="right:10.1mm;left:9.5mm;top:76mm;text-align:right;font-size:3mm;line-height:1.85">'
         f'<p>ركيزتا حرف <span class="en">H</span> هما المشكلة التي تأتينا بها والنتيجة التي تريدها، والوصلة بينهما هي الحل الذي نبنيه معك.</p>'
@@ -134,7 +134,7 @@ def pnum(n, color=GREY2):
 def profile_cover():
     body = (
         f'<div class="abs" style="inset:-3mm;{pattern(26, CH, TE, CH, MU, .09)}"></div>'
-        f'<div class="abs" style="left:14mm;top:92mm">{word("182mm", "#2B2C33", TE)}</div>'
+        f'<div class="abs" style="left:14mm;top:92mm">{word("182mm", WM_STEM, WM_BAR)}</div>'
         f'<div class="abs" style="right:14mm;top:13.5mm">{chip("الملف التعريفي · <span class=en>2026</span>", CH, "2.5mm")}</div>'
         + dot("10mm", RO, "left:116.5mm;top:24.5mm") + pill("40mm", "12.5mm", MU, "left:171mm;top:23.3mm")
         + f'<div class="abs" style="right:14mm;top:203mm">{logo("68mm", CH, TE)}</div>'
@@ -148,8 +148,8 @@ def profile_cover():
 def profile_about():
     card = (f'<div class="abs" style="left:14mm;right:14mm;top:98mm;height:62mm;border-radius:5mm;background:{DK};color:{CH};overflow:hidden">'
             f'<div class="abs" style="inset:0;{pattern(16, CH, TE, CH, MU, .08)}"></div>'
-            f'<div class="abs" style="right:10mm;top:13mm">{bridge("27mm", CH, TE)}</div>'
-            f'<div class="abs" style="right:7mm;top:44mm;width:32mm;display:flex;justify-content:space-between;font-size:2.3mm;color:{CH_DIM}">'
+            f'<div class="abs" style="right:9mm;top:23mm">{word("34mm", CH, TE)}</div>'
+            f'<div class="abs" style="right:9mm;top:32.5mm;width:34mm;display:flex;justify-content:space-between;font-size:2.3mm;color:{CH_DIM}">'
             f'<span>المشكلة</span><span style="color:{TE}">الحل</span><span>النتيجة</span></div>'
             f'<div class="abs" style="right:48mm;left:10mm;top:17mm;text-align:right"><div style="font-size:4.8mm;font-weight:700">في قلب اسمنا جسر</div>'
             f'<div style="font-size:2.85mm;line-height:1.85;color:{CH_DIM};margin-top:3mm">ركيزتا حرف <span class="en">H</span> هما المشكلة التي تأتينا بها والنتيجة التي تريدها، '
@@ -327,7 +327,8 @@ def outdoor_banner():
     return Piece("outdoor-banner-300x100cm-scale-1-10", 300, 100, body, bg=CH, fg=DK)
 
 
-ALL = lambda: [flyer(), brochure_outside(), brochure_inside(), *profile_pages(), rollup(), shop_sign(), outdoor_banner()]
+# shop_sign() is left out of the package (Marwa, 19 and 26 Oct: no storefront sign or photo in any design)
+ALL = lambda: [flyer(), brochure_outside(), brochure_inside(), *profile_pages(), rollup(), outdoor_banner()]
 
 if __name__ == "__main__":
     import sys as _s

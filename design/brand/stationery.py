@@ -9,9 +9,10 @@ def card_front():
     body = (
         f'<div class="abs" style="left:0;right:0;top:15.6mm;display:flex;justify-content:center">{logo("49.5mm", CH, TE)}</div>'
         f'<div class="abs" style="left:0;right:0;top:31.6mm;text-align:center;font-size:2.15mm;font-weight:400;color:{CH_DIM}">{LINE_AR}</div>'
-        + pill("24mm", "7.1mm", TE, "left:-3mm;top:36mm")
-        + dot("4.6mm", MU, "left:24.1mm;top:37.2mm")
-        + dot("12.9mm", SL, "left:82mm;top:6mm")
+        # 26 Oct (Marwa): nothing on the card is cut at the edge; every shape sits inside the trim
+        + pill("18mm", "6.2mm", TE, "left:6.6mm;top:37.2mm")
+        + dot("4.6mm", MU, "left:27.4mm;top:38mm")
+        + dot("7.4mm", SL, "left:76mm;top:6.6mm")
     )
     return Piece("business-card-front", 90, 50, body, bg=DK, fg=CH)
 
@@ -163,7 +164,7 @@ def folder():
     stem = "#2B2C33"
     body = (
         f'<div class="abs" style="inset:-3mm;{pattern(30, CH, TE, CH, MU, .09)}"></div>'
-        f'<div class="abs" style="left:22.5mm;right:22.5mm;top:96mm">{word("185mm", stem, TE)}</div>'
+        f'<div class="abs" style="left:22.5mm;right:22.5mm;top:96mm">{word("185mm", WM_STEM, WM_BAR)}</div>'
         + dot("12.9mm", RO, "left:159mm;top:41.4mm")
         + pill("56mm", "15.8mm", MU, "left:180.1mm;top:40mm")
         + f'<div class="abs" style="right:22.5mm;top:230mm">{logo("77mm", CH, TE)}</div>'

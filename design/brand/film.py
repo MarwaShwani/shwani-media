@@ -10,8 +10,17 @@ W, H, FPS = 1920, 1080, 30
 DK, CH, TE = (32, 33, 38), (242, 233, 216), (224, 122, 71)
 FONT = os.path.join(os.path.dirname(HERE), "node_modules", "@fontsource", "alexandria", "files")
 
-MOCKS = ["01-business-cards", "02-stationery", "07-company-profile", "04-rollup", "12-tshirts",
-         "14-mugs", "09-packaging", "13-outdoor-banner", "10-screens"]
+# 26 Oct (Marwa): no storefront; portrait photos (roll-up, tote) were cropped to 16:9 and lost their design,
+# so every mockup is now shown whole (fitted, never cropped) over a blurred, darkened copy of itself.
+MOCKS = ["01-business-cards", "02-stationery", "07-company-profile", "03-flyer", "04-rollup", "13-outdoor-banner",
+         "12-tshirts", "11-tote", "14-mugs", "09-packaging", "08-notebook", "16-executive-pen", "10-screens"]
+LABELS = {"01-business-cards": "بطاقة العمل", "02-stationery": "الأوراق الرسمية", "03-flyer": "الفلاير",
+          "07-company-profile": "الملف التعريفي", "04-rollup": "الرول أب", "12-tshirts": "التيشيرت",
+          "14-mugs": "الأكواب", "11-tote": "الحقيبة", "09-packaging": "التغليف",
+          "16-executive-pen": "القلم التنفيذي وطقم الهدية", "08-notebook": "الدفتر والقلم التنفيذي",
+          "13-outdoor-banner": "البنر الخارجي", "10-screens": "الشاشات"}
+BOX_W, BOX_H = 1700, 900      # the whole photo fits inside this box, centred a little above the middle
+
 
 
 def ease(t):
@@ -50,6 +59,34 @@ def render_text_png(html, path, w, h):
     return Image.open(path).convert("RGBA")
 
 
+_MASKS = {}
+
+
+def rounded_mask(w, h, r):
+    key = (w, h, r)
+    if key not in _MASKS:
+        m = Image.new("L", (w * 2, h * 2), 0)
+        ImageDraw.Draw(m).rounded_rectangle((0, 0, w * 2 - 1, h * 2 - 1), r * 2, fill=255)
+        _MASKS[key] = m.resize((w, h), Image.LANCZOS)
+    return _MASKS[key]
+
+
+def gallery_layers(src):
+    """Background (blurred, darkened cover crop), the fitted photo, and a soft shadow mask."""
+    from PIL import ImageFilter
+    sw, sh_ = src.size
+    kc = max(W / sw, H / sh_)
+    cov = src.resize((int(sw * kc) + 2, int(sh_ * kc) + 2), Image.BILINEAR)
+    x0, y0 = (cov.size[0] - W) // 2, (cov.size[1] - H) // 2
+    cov = cov.crop((x0, y0, x0 + W, y0 + H)).filter(ImageFilter.GaussianBlur(38))
+    bg = Image.blend(cov, Image.new("RGB", (W, H), DK), .62)
+    kf = min(BOX_W / sw, BOX_H / sh_)
+    fg = src.resize((int(sw * kf), int(sh_ * kf)), Image.LANCZOS)
+    sm = Image.new("L", (fg.size[0] + 120, fg.size[1] + 120), 0)
+    ImageDraw.Draw(sm).rounded_rectangle((60, 60, fg.size[0] + 60, fg.size[1] + 60), 24, fill=150)
+    return bg, fg, sm.filter(ImageFilter.GaussianBlur(26))
+
+
 def main():
     tmp = os.path.join(OUT, "film")
     os.makedirs(tmp, exist_ok=True)
@@ -61,12 +98,11 @@ def main():
                               '<span dir="ltr">shwanicompany@gmail.com</span><br><span dir="ltr">shwanicompany</span> · انستغرام · فيسبوك</div>',
                               os.path.join(tmp, "contact.png"), 1920, 140)
     caps = {}
-    labels = {"05-storefront": "لافتة الواجهة", "01-business-cards": "بطاقة العمل", "02-stationery": "الأوراق الرسمية",
-              "07-company-profile": "الملف التعريفي", "04-rollup": "الرول أب", "12-tshirts": "التيشيرت",
-              "14-mugs": "الأكواب", "09-packaging": "التغليف", "13-outdoor-banner": "البنر الخارجي", "10-screens": "الشاشات"}
     for m in MOCKS:
-        caps[m] = render_text_png(f'<div style="display:inline-block;margin:0 0 0 0;padding:14px 34px;border-radius:40px;background:rgba(32,33,38,.82);'
-                                  f'color:rgb{CH};font-size:36px;font-weight:600">{labels[m]}</div>', os.path.join(tmp, f"cap-{m}.png"), 700, 100)
+        c = render_text_png(f'<div style="display:inline-block;padding:14px 34px;border-radius:40px;background:rgba(32,33,38,.86);'
+                            f'color:rgb{CH};font-size:36px;font-weight:600;white-space:nowrap">{LABELS[m]}</div>',
+                            os.path.join(tmp, f"cap-{m}.png"), 900, 100)
+        caps[m] = c.crop(c.getbbox())
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
                            "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", os.path.join(tmp, "video.mp4")], stdin=subprocess.PIPE)
     cues = []
@@ -97,34 +133,32 @@ def main():
             tg.putalpha(tg.getchannel("A").point(lambda v: int(v * a3)))
             f.paste(tg, (0, 760), tg)
         emit(f)
-    # 2) mockups with slow push-in and cross-fade (2.2 s each)
-    seg, fade = 2.2, .35
+    # 2) mockups, each shown whole: blurred copy behind, the photo fitted on top with a slow push-in (2.4 s each)
+    seg, fade = 2.4, .4
     t0 = 3.6
     prev = None
     for k, m in enumerate(MOCKS):
         src = Image.open(os.path.join(OUT, "mockups", m + ".jpg")).convert("RGB")
-        sw, sh_ = src.size
-        k0 = max(W / sw, H / sh_)
-        base = src.resize((int(sw * k0 * 1.12), int(sh_ * k0 * 1.12)), Image.LANCZOS)
+        bg, fg, shadow = gallery_layers(src)
         cues.append((t0 + k * seg, "paper"))
         nn = int(seg * FPS)
+        cap = caps[m]
         for i in range(nn):
-            p = i / nn
-            z = 1.12 - .1 * p
-            cw, chh = int(W * z / 1.12 * base.size[0] / (W * 1.0) * (W / base.size[0]) * 1.12), 0
-            # crop window that shrinks toward the centre
-            ww, hh = int(base.size[0] / z * 1.0), int(base.size[1] / z)
-            ww, hh = min(ww, base.size[0]), min(hh, base.size[1])
-            x0, y0 = (base.size[0] - ww) // 2, (base.size[1] - hh) // 2
-            fr = base.crop((x0, y0, x0 + ww, y0 + hh)).resize((W, H), Image.BILINEAR)
+            p = i / (nn - 1)
+            z = 1.0 + .035 * p                       # gentle push-in, the photo stays whole
+            fw, fh = int(fg.size[0] * z), int(fg.size[1] * z)
+            x, y = (W - fw) // 2, (H - fh) // 2 - 30
+            fr = bg.copy()
+            sh_ = shadow.resize((fw + 120, fh + 120), Image.BILINEAR)
+            fr.paste((0, 0, 0), (x - 60, y - 40), sh_)
+            fr.paste(fg.resize((fw, fh), Image.BILINEAR), (x, y), rounded_mask(fw, fh, 18))
             if prev is not None and i < fade * FPS:
-                fr = Image.blend(prev, fr, i / (fade * FPS))
-            cap = caps[m]
+                fr = Image.blend(prev, fr, ease(i / (fade * FPS)))
             fr = fr.convert("RGBA")
             ca = ease((i - 6) / 10)
             c2 = cap.copy()
             c2.putalpha(c2.getchannel("A").point(lambda v: int(v * ca)))
-            fr.paste(c2, (W - 700 - 70, H - 160), c2)
+            fr.paste(c2, (x + fw - cap.size[0] - 28, y + fh - cap.size[1] // 2), c2)
             fr = fr.convert("RGB")
             emit(fr)
         prev = fr
