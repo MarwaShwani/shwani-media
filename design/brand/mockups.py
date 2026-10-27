@@ -44,7 +44,10 @@ MOCKUPS = {
         ("flyer-a5", Q([(550.7, 584.5), (1347.1, 391.2), (1997.2, 1231.8), (1018.3, 1559.2)]), {}),
     ]),
     "04-rollup": ("rollup-hall-blank.jpg", [
-        ("rollup-85x200cm-scale-1-10", Q([(528.8, 342.4), (1221.7, 323.1), (1204.2, 2012.9), (514.3, 2008.7)]), {}),
+        # 26 Oct (Marwa): the print stopped above the base on the right; the banner runs down to the lip of the base,
+        # which slopes in the photo (measured along the lip), so the lower corners follow it
+        ("rollup-85x200cm-scale-1-10", Q([(528.8, 342.4), (1221.7, 323.1), (1203.8, 2055.5), (514.3, 2013.4)]),
+         {"old_quad": Q([(528.8, 342.4), (1221.7, 323.1), (1204.2, 2012.9), (514.3, 2008.7)]), "paper_min": 190}),
     ]),
     # "05-storefront" removed: Marwa, 19 Oct, no outside-office photo in any design
     "06-brochure": ("brochure-blank.jpg", [

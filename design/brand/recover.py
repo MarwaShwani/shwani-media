@@ -188,16 +188,16 @@ def recover(name, old_mock_dir, old_png):
     # corrected quads: the surface around the old quad is real paper; bring the rebuilt part to the same level
     for (a, img, q, opt), raw in zip(L, spec[1]):
         if "old_quad" in opt:
-            blank = match_paper(blank, mock, q, np.float32(raw[1]))
+            blank = match_paper(blank, mock, q, np.float32(raw[1]), level=opt.get("paper_min", 225))
     return np.clip(blank, 0, 255).astype(np.uint8)
 
 
-def match_paper(blank, mock, old_q, new_q, ring=25):
+def match_paper(blank, mock, old_q, new_q, ring=25, level=225):
     Hs, Ws = blank.shape[:2]
     old_m = quad_mask(old_q, (Ws, Hs))
     new_m = quad_mask(new_q, (Ws, Hs))
     near_out = (cv2.dilate(old_m.astype(np.uint8), np.ones((2 * ring + 1,) * 2, np.uint8)) > 0) & ~old_m & new_m
-    paper = near_out & (mock.mean(2) > 225)
+    paper = near_out & (mock.mean(2) > level)
     near_in = old_m & (cv2.dilate(paper.astype(np.uint8), np.ones((2 * ring + 1,) * 2, np.uint8)) > 0)
     near_in &= cv2.erode(old_m.astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
     if paper.sum() < 200 or near_in.sum() < 200:
@@ -206,6 +206,13 @@ def match_paper(blank, mock, old_q, new_q, ring=25):
     region = cv2.erode(old_m.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
     out = blank.copy()
     out[region] = np.clip(blank[region] * k, 0, 255)
+    # the old quad's edge (a few pixels where old art and photo were blended) leaves a faint line: fill it from both sides
+    edge = np.zeros((Hs, Ws), np.uint8)
+    cv2.polylines(edge, [np.int32(np.round(old_q)).reshape(-1, 1, 2)], True, 1, 1)
+    edge = (cv2.dilate(edge, np.ones((9, 9), np.uint8)) > 0) & new_m
+    w = (new_m & ~edge).astype(np.float32)          # only the surface itself feeds the fill
+    fill = fill_smooth(out.astype(np.float32), w, scales=(2, 5, 12))
+    out[edge] = np.clip(fill[edge], 0, 255)
     print("  paper level matched, x", np.round(k, 3))
     return out
 
