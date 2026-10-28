@@ -42,6 +42,7 @@ INTRO = 2.0                         # the opening, question to first photo (Marw
 (T1, T2, T3), DUR = timeline([INTRO, N_PHOTOS * PHOTO_D + .6, 7.6])
 ANSWER_D = 1.0                      # «في كل مكان.» heads the first photo for a second, then the group lines
 DUR_DESIGN = DUR
+SAVE_AT = 2.4                       # «احفظه...» comes after the last of the three ticks (t0 + 2.2)
 
 
 def _group_starts():
@@ -66,7 +67,7 @@ VO_PLAN = [
     (_G[3], "في هدايا العملاء،", None),
     (_G[4], "وعلى كل شاشة.", None),
     (T3, "أول ثلاث قطع لشركتك: بطاقة العمل، والورق الرسمي والظرف، والملف التعريفي.", None),
-    (T3 + 2.2, "احفظه قبل أن تطبع هويتك، وأرسله لصاحب مشروع جديد.", T3 + 2.21),
+    (T3 + SAVE_AT, "احفظه قبل أن تطبع هويتك، وأرسله لصاحب مشروع جديد.", T3 + SAVE_AT - .05),
 ]
 VO = load_vo(HERE)
 if VO:
@@ -148,7 +149,7 @@ def scene3():
                      "أرسله لصاحب مشروع جديد", card_bg=CH, card_fg=DK, tick_bg=TE, tick_fg=DK, send_bg=DK, send_fg=CH,
                      logo_color=DK)
     html = html.replace(lockup_svg(330, DK), mono(330))        # the terracotta link would vanish on terracotta
-    return R.scene(t0, None, html + R.txt(t0 + 2.2, "احفظه قبل أن تطبع هويتك.", 900, 44, weight=600, kind="fade"))
+    return R.scene(t0, None, html + R.txt(t0 + SAVE_AT, "احفظه قبل أن تطبع هويتك.", 900, 44, weight=600, kind="fade"))
 
 
 def cover():

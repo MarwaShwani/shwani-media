@@ -30,6 +30,7 @@ GAP_OPENING = .05    # the opening question runs straight into the answer: the c
 MAX_SPEEDUP = 1.2
 PAUSE_KEEP = .28     # pauses inside a sentence (at commas) are shortened to this, for a lively pace
 PAUSE_KEEP_OPENING = .1
+VO_PEAK_DB = -10     # every sentence peaks here: a calm, even level (Marwa, 16 Oct: peaks about -10 dBFS)
 
 
 def load(path):
@@ -135,7 +136,7 @@ def main():
             holds.append((round(h, 3), round(extra, 3)))
             start += extra
         f = os.path.join("vo", f"{i + 1:02d}.wav")
-        save(os.path.join(here, f), x)
+        save(os.path.join(here, f), x / (np.max(np.abs(x)) or 1) * 10 ** (VO_PEAK_DB / 20))
         voice.append((round(start, 3), f))
         end = start + len(x) / SR + (GAP if i else GAP_OPENING)
         print(f"{start:6.2f}s  {len(x) / SR:4.2f}s  {text}")
