@@ -1,4 +1,4 @@
-"""Single post «أعمالنا 4: هويتنا كاملة في صورة» (Marwa, 28 Oct 2026: the whole identity on one desk, from above).
+"""Post 12: single image «أعمالنا 3: هويتنا كاملة في صورة» (Marwa, 28 Oct 2026: the whole identity on one desk, from above).
 
 Row 4: terracotta base with charcoal text, post-10 sizes. The photo is brand/out/mockups/17-desk-flatlay.jpg
 (made by brand/flatlay.py on a blank Gemini scene). Every piece carries a number, so the question
@@ -48,7 +48,7 @@ def photo():
 
 def slide():
     body = (
-        f'<div class="top"><span class="chip">أعمالنا · الحلقة 4</span>{mono(190)}</div>'
+        f'<div class="top"><span class="chip">أعمالنا · الحلقة 3</span>{mono(190)}</div>'
         + spacer(22)
         + '<h1 style="font-size:70px;line-height:1.25">هويتنا كاملة في صورة</h1>'
         + spacer(24)

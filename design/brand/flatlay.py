@@ -1,4 +1,4 @@
-"""The whole identity on one desk, seen from above (post «أعمالنا 4: الهوية كاملة في صورة», Marwa, 28 Oct 2026).
+"""The whole identity on one desk, seen from above (post 12 «أعمالنا 3: هويتنا كاملة في صورة», Marwa, 28 Oct 2026).
 
 Scene: scenes/desk-flatlay-blank.jpg, a blank top-down flat lay made with Gemini in Marwa's account on 28 Oct
 (every paper item plain white, a black folded T-shirt, a phone with a black screen). The exact print files from

@@ -1,4 +1,4 @@
-"""Reel «أعمالنا 3: فيلم هويتنا», ~40 s (Marwa, 28 Oct 2026: the reel is the brand film).
+"""Post 11: reel «أعمالنا 2: فيلم هويتنا», ~40 s (Marwa, 28 Oct 2026: the reel is the brand film).
 
 The 16:9 brand film (brand/film.py) re-cut for a phone: 1080x1920, every mockup shown whole and large,
 on the row-4 terracotta with charcoal text. Reel rules (SHWANI-COMPANY-project.md):
@@ -21,7 +21,7 @@ from PIL import Image
 
 MOCKS = os.environ.get("MOCKS", os.path.join(DESIGN, "brand", "out", "mockups"))
 R = Reel(bg=TE, fg=DK, acc=DK)
-SERIES = "أعمالنا · الحلقة 3"
+SERIES = "أعمالنا · الحلقة 2"
 ICON_SET = ["doc", "mail", "pen", "case", "bag", "star", "book", "square"]
 PHOTO_D = 2.0                       # seconds per photo
 

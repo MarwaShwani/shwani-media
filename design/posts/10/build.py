@@ -1,225 +1,130 @@
-"""Post 10: carousel «أعمالنا» الحلقة 1 — كيف صمّمنا شعار SHWANI. 7 slides.
+"""Post 10: carousel «أعمالنا 1: هكذا تبدو هويتنا مطبوعة», 10 slides (Marwa, 28 Oct 2026).
 
-Row 4: terracotta base (#E07A47) with charcoal text and the original sizes (Marwa, 20 Oct: white text,
-bigger phone sizes and teal background capsules were tried and dropped: the slides got crowded).
-No price in any post (Marwa, 19 Oct): the closing slide's price line is gone.
-Teal (#2F6F6D) is an identity colour since 20 Oct, so slide 5 shows six colours.
-Marwa, 19 Oct 2026:
-- the identity is the word SHWANI only: no SH monogram, no lone H, no H pattern. Every slide that
-  talks about the link shows the whole word, with the link marked inside it.
-- no logo or word is cut at the slide edge; check_marks() below fails the build if one is.
-The terracotta link would vanish on a terracotta ground, so the logo always sits on a charcoal or milky card.
+The first post 10 («أعمالنا 1: كيف صمّمنا شعار SHWANI») was cancelled by Marwa on 28 Oct (posts/10-cancelled-logo-story);
+the row-4 episodes are now 1 (this carousel), 2 (reel 11, the brand film) and 3 (post 12, the desk).
+
+Row 4: terracotta base with charcoal text and the post-10 sizes (title 70, text 32-36, bars 24-28).
+One mockup per slide, shown edge to edge in a 1080x760 band so the print reads on a phone.
+- slide 1: the result first (business cards) and the question «شعار واحد، كيف صار هوية كاملة؟»
+- slide 2: a second, standalone hook (the signing hand), because Instagram re-serves carousels from slide 2
+- slide 6: the mugs, the second strongest photo, at the midpoint where swipers drop off
+- slide 10: «أيّ قطعة تريدها لمشروعك؟ اكتب رقم شريحتها», save and send, next episode without a day
+No price anywhere. No storefront photo (05-storefront is excluded from every design).
+Mockups are read from brand/out/mockups (the delivered package, 26-28 Oct; MOCKS env var overrides).
 """
-import os, sys, re, asyncio
+import os, sys, asyncio
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+DESIGN = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, DESIGN)
 from common import *  # noqa: F401,F403
-from rounded import shwani, lockup  # noqa: E402
+from rounded import lockup  # noqa: E402
+from PIL import Image, ImageFilter, ImageEnhance
 
-ROW_BG = TE
-INK = DK                       # text on terracotta
-DIM = "rgba(32,33,38,.72)"
-CARD_D = DK                    # charcoal card, milky text
-CARD_L = CH                    # milky card, charcoal text
-N = 7
-SERIES = "أعمالنا · الحلقة 1"
-WS = shwani(DK, TE).width()    # 4205 units at cap height 700
+MOCKS = os.environ.get("MOCKS", os.path.join(DESIGN, "brand", "out", "mockups"))
+ROW_BG, INK = TE, DK
+DIM = "rgba(32,33,38,.74)"
+N = 10
+BW, BH = 1080, 760          # photo band
+
+
+def mono(width, color=DK):
+    svg = lockup(color, color, color)
+    return svg.replace('<svg ', f'<svg class="wm" style="width:{width}px;height:auto;display:block;flex-shrink:0" ', 1) \
+              .replace(' width="', ' data-w="', 1).replace(' height="1180"', '', 1)
+
+
+def band_image(name, shift=0.0, BH=BH):
+    """Crop the mockup to the band ratio (centre crop, shift moves it -1..1) and save it next to the slides.
+    A portrait photo is shown whole over a blurred, darkened copy of itself (as in the brand film)."""
+    src = Image.open(os.path.join(MOCKS, name + ".jpg")).convert("RGB")
+    w, h = src.size
+    out = os.path.join(HERE, f"band-{name}-{BH}.jpg")
+    if h > w:
+        bg = src.resize((BW, int(h * BW / w)), Image.LANCZOS)
+        top = (bg.height - BH) // 2
+        bg = bg.crop((0, top, BW, top + BH)).filter(ImageFilter.GaussianBlur(28))
+        bg = ImageEnhance.Brightness(bg).enhance(0.72)
+        fg = src.resize((int(w * BH / h), BH), Image.LANCZOS)
+        bg.paste(fg, ((BW - fg.width) // 2, 0))
+        bg.save(out, quality=92)
+        return out
+    r = BW / BH
+    if w / h > r:                       # too wide: trim the sides
+        cw = int(h * r)
+        x0 = int((w - cw) / 2 * (1 + shift))
+        box = (x0, 0, x0 + cw, h)
+    else:                               # too tall: trim top and bottom
+        ch = int(w / r)
+        y0 = int((h - ch) / 2 * (1 + shift))
+        box = (0, y0, w, y0 + ch)
+    src.crop(box).resize((BW, BH), Image.LANCZOS).save(out, quality=92)
+    return out
+
+
+def band(name, shift=0.0, BH=BH, badge=None):
+    """badge: the slide number as a charcoal sticker inside the photo's lower right corner (for «اكتب رقم شريحتها»)."""
+    path = band_image(name, shift, BH)
+    sticker = (f'<span class="ltr" style="position:absolute;right:72px;bottom:30px;width:92px;height:92px;border-radius:46px;'
+               f'background:{DK};color:{CH};border:6px solid {TE};display:flex;align-items:center;justify-content:center;'
+               f'font-size:44px;font-weight:800">{badge}</span>') if badge else ""
+    return (f'<div class="z" style="margin:0 -72px;width:{BW}px;height:{BH}px;flex-shrink:0;position:relative;'
+            f'background:url(\'file://{path}\') center/cover;box-shadow:0 18px 40px rgba(32,33,38,.22)">{sticker}</div>')
+
+
+def num(k, size=64):
+    return (f'<span class="ltr" style="flex-shrink:0;width:{size}px;height:{size}px;border-radius:{size // 2}px;background:{DK};color:{CH};'
+            f'display:flex;align-items:center;justify-content:center;font-size:{int(size * .5)}px;font-weight:800">{k}</span>')
 
 
 def pg(body):
     return page(body, bg=ROW_BG, fg=INK)
 
 
-def word(width, color=CH, bar=TE, sharp=False):
-    """The SHWANI word alone, width in px. sharp=True draws the same letters with square ends (for the comparison)."""
-    svg = shwani(color, bar).svg()
-    if sharp:
-        svg = svg.replace('stroke-linecap="round" stroke-linejoin="round"', 'stroke-linecap="butt" stroke-linejoin="miter"')
-    return (f'<svg class="wm" aria-label="SHWANI" viewBox="-30 -730 {WS + 60:.0f} 760" '
-            f'style="width:{width}px;height:auto;display:block;flex-shrink:0">{svg}</svg>')
+def piece(i, chip, photo, title, text, shift=0.0):
+    body = (
+        top(chip, i, N)
+        + spacer(34)
+        + band(photo, shift, badge=i)
+        + spacer(40)
+        + f'<h1 style="font-size:70px;line-height:1.25">{title}</h1>'
+        + f'<p style="font-size:34px;font-weight:400;line-height:1.6;margin-top:18px;color:{DIM};text-wrap:pretty">{text}</p>'
+        + GROW + bottom(arrow=DK)
+    )
+    return pg(body)
 
-
-def full(width, color=CH, sub=None):
-    svg = lockup(color, TE, sub or color)
-    return svg.replace('<svg ', f'<svg class="wm" style="width:{width}px;height:auto;display:block;flex-shrink:0" ', 1) \
-              .replace(' width="', ' data-w="', 1).replace(' height="1180"', '', 1)
-
-
-def mono(width, color=DK):
-    """One-colour lockup: on terracotta the terracotta link would vanish, so the whole logo takes one ink."""
-    svg = lockup(color, color, color)
-    return svg.replace('<svg ', f'<svg class="wm" style="width:{width}px;height:auto;display:block;flex-shrink:0" ', 1) \
-              .replace(' width="', ' data-w="', 1).replace(' height="1180"', '', 1)
-
-
-def card(inner, bg=CARD_D, pad="56px 60px", style=""):
-    return f'<div class="z" style="background:{bg};border-radius:40px;padding:{pad};{style}">{inner}</div>'
-
-
-def num(k, size=60, bg=DK, fg=CH):
-    return (f'<span class="ltr" style="flex-shrink:0;width:{size}px;height:{size}px;border-radius:{size // 2}px;background:{bg};color:{fg};'
-            f'display:flex;align-items:center;justify-content:center;font-size:{int(size * .5)}px;font-weight:800">{k}</span>')
-
-
-def tip(text, label="الفكرة"):
-    return (f'<div class="z" style="border:3px solid {DK};border-radius:32px;padding:26px 34px;display:flex;gap:22px;align-items:center">'
-            f'<span style="flex-shrink:0;font-size:30px;font-weight:800;background:{DK};color:{CH};border-radius:24px;padding:6px 20px">{label}</span>'
-            f'<span style="flex:1;font-size:32px;font-weight:500;line-height:1.55;text-wrap:balance">{text}</span></div>')
-
-
-# ---------- slides ----------
 
 def cover():
-    big = card(f'<div style="display:flex;justify-content:center">{full(640, CH)}</div>', CARD_D, "92px 60px 84px",
-               "box-shadow:0 26px 60px rgba(32,33,38,.28)")
     body = (
-        top(SERIES, 1, N)
-        + deco(f"right:-90px;top:120px;width:300px;height:300px;border-radius:150px;background:{RO}")
-        + deco(f"left:70px;top:150px;width:110px;height:110px;border-radius:55px;background:{CH}")
-        + deco(f"left:-60px;top:360px;width:250px;height:76px;border-radius:38px;background:{MU}")
-        + spacer(250)
-        + big
-        + GROW
-        + '<h1 style="font-size:96px;line-height:1.2">كيف صمّمنا<br>شعار <span class="ltr">SHWANI</span>؟</h1>'
-        + spacer(26)
-        + '<p style="font-size:34px;line-height:1.7">قصة هويتنا، من الفكرة إلى الشعار.</p>'
-        + spacer(70) + bottom(arrow=DK)
-    )
-    return pg(body)
-
-
-GOALS = [("يُقرأ بسهولة", "من بعيد على لافتة، ومن قريب على بطاقة صغيرة."),
-         ("بسيط", "لون واحد يكفيه، فيُطبع على أي شيء: ورق، قماش، خشب."),
-         ("له معنى", "يحكي ما نفعله لعملائنا، لا مجرد حروف جميلة.")]
-
-
-def s_goals():
-    rows = "".join(
-        f'<div style="display:flex;align-items:center;gap:28px;padding:30px 0;{"border-top:2px solid rgba(32,33,38,.18);" if k else ""}">'
-        f'{num(k + 1, 70)}<div style="flex:1"><div style="font-size:46px;font-weight:800">{a}</div>'
-        f'<div style="font-size:33px;font-weight:400;color:{DIM};margin-top:8px;line-height:1.5">{b}</div></div></div>'
-        for k, (a, b) in enumerate(GOALS))
-    body = (
-        top("قبل الرسم", 2, N)
-        + spacer(60)
-        + '<h1 style="font-size:70px;line-height:1.3">قبل أن نرسم،<br>كتبنا ماذا نريد</h1>'
-        + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65">ثلاثة شروط وضعناها لشعارنا، كما نضعها مع كل عميل:</p>'
-        + spacer(30)
-        + f'<div class="z">{rows}</div>'
-        + GROW + tip("نبدأ دائماً بسؤال: ماذا يجب أن يقول الشعار؟ ثم نرسم.", "طريقتنا")
-        + spacer(44) + bottom(arrow=DK)
-    )
-    return pg(body)
-
-
-def s_idea():
-    # the whole word on a milky card; the link inside it is marked with a label above, the two sides below
-    W = 820
-    k = W / (WS + 60)
-    def x(u):   # word units -> px from the svg's left edge
-        return (u + 30) * k
-    h_left, h_right = 805, 1235           # centre lines of the two strokes beside the link
-    link_c = x((h_left + h_right) / 2)
-    lab = "font-size:32px;font-weight:700;white-space:nowrap;position:absolute;transform:translateX(-50%)"
-    tick = f"position:absolute;width:4px;border-radius:2px;background:{DK};transform:translateX(-50%)"
-    hw = 760 * k                          # rendered word height
-    yb = 96 + hw                          # bottom of the word inside the box
-    art = (f'<div style="position:relative;width:{W}px;margin:0 auto;padding:96px 0 110px">'
-           f'<div style="{lab};left:{link_c:.0f}px;top:0;color:{TE}">الحل</div>'
-           f'<div style="{tick};left:{link_c:.0f}px;top:52px;height:40px;background:{TE}"></div>'
-           f'{word(W, DK, TE)}'
-           f'<div style="{tick};left:{x(h_left):.0f}px;top:{yb + 6:.0f}px;height:40px"></div>'
-           f'<div style="{tick};left:{x(h_right):.0f}px;top:{yb + 6:.0f}px;height:40px"></div>'
-           f'<div style="{lab};left:{x(h_left) - 70:.0f}px;top:{yb + 52:.0f}px;color:{DK}">المشكلة</div>'
-           f'<div style="{lab};left:{x(h_right) + 70:.0f}px;top:{yb + 52:.0f}px;color:{DK}">النتيجة</div></div>')
-    body = (
-        top("الفكرة", 3, N)
-        + spacer(60)
-        + '<h1 style="font-size:70px;line-height:1.3">الفكرة: جسر<br>داخل الاسم نفسه</h1>'
-        + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">عميلنا يأتي بمشكلة، ويريد نتيجة. عملنا هو ما بينهما.</p>'
-        + spacer(44)
-        + card(art, CARD_L, "40px 40px")
-        + GROW + tip("لون التيراكوتا في الشعار كله لهذه الوصلة وحدها، فتلفت العين إليها.", "التفصيل")
-        + spacer(44) + bottom(arrow=DK)
-    )
-    return pg(body)
-
-
-def s_shape():
-    def side(label, ok, sharp, note):
-        mark = (f'<span style="font-size:28px;font-weight:800;padding:6px 18px;border-radius:20px;'
-                f'background:{TE if ok else "rgba(242,233,216,.16)"};color:{DK if ok else CH}">{label}</span>')
-        return (f'<div style="display:flex;flex-direction:column;align-items:center;gap:22px">'
-                f'<div style="display:flex;gap:18px;align-items:center">{mark}'
-                f'<span style="font-size:31px;font-weight:400;color:rgba(242,233,216,.82)">{note}</span></div>'
-                f'{word(660, CH, TE, sharp=sharp)}</div>')
-    pair = (f'<div style="display:flex;flex-direction:column;gap:34px">'
-            f'{side("أطراف حادة", False, True, "رسمية وباردة")}'
-            f'<div style="height:2px;background:rgba(242,233,216,.18)"></div>'
-            f'{side("أطراف مستديرة", True, False, "ودودة وواضحة")}</div>')
-    body = (
-        top("الشكل", 4, N)
-        + spacer(60)
-        + '<h1 style="font-size:70px;line-height:1.3">الحروف نفسها،<br>وإحساس مختلف</h1>'
-        + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">رسمنا كل حرف بخط واحد بسمك ثابت، ثم جرّبنا الأطراف:</p>'
-        + spacer(44)
-        + card(pair, CARD_D, "38px 44px")
-        + GROW + tip("السُّمك الثابت يبقى واضحاً حتى حين يصغر الشعار على قلم أو ختم.", "لماذا")
-        + spacer(44) + bottom(arrow=DK)
-    )
-    return pg(body)
-
-
-COLORS = [(DK, CH, "فحمي", "القاعدة والكتابة"), (CH, DK, "حليبي", "الورق والمساحات"),
-          (TE, DK, "تيراكوتا", "الوصلة، أي الحل"), (MU, DK, "مسطردي", "لمسة دافئة صغيرة"),
-          (TL, CH, "أخضر مزرق", "لمسة هادئة تقابل الدفء"), (RO, DK, "وردي مغبر", "الأشكال المساعدة")]
-
-
-def s_colors():
-    rows = "".join(
-        f'<div style="display:flex;align-items:center;gap:24px;padding:14px 26px;border-radius:30px;background:{CH}">'
-        f'<span style="flex-shrink:0;width:76px;height:76px;border-radius:38px;background:{c};'
-        f'{"border:3px solid rgba(32,33,38,.25);" if c in (CH, TE) else ""}"></span>'
-        f'<div style="flex:1;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap"><span style="font-size:40px;font-weight:800;color:{DK}">{name}</span>'
-        f'<span style="font-size:31px;font-weight:400;color:rgba(32,33,38,.72)">{role}</span></div>'
-        f'<span class="ltr" style="font-size:30px;font-weight:500;color:rgba(32,33,38,.6)">{c}</span></div>'
-        for c, fg, name, role in COLORS)
-    body = (
-        top("الألوان", 5, N)
-        + spacer(52)
-        + '<h1 style="font-size:70px;line-height:1.3">ستة ألوان،<br>ولكل لون عمل</h1>'
+        top("أعمالنا · الحلقة 1", 1, N)
+        + spacer(40)
+        + '<h1 style="font-size:84px;line-height:1.22">شعار واحد،<br>كيف صار هوية كاملة؟</h1>'
+        + spacer(40)
+        + band("01-business-cards", BH=680)
         + spacer(36)
-        + f'<div class="z" style="display:flex;flex-direction:column;gap:12px">{rows}</div>'
-        + GROW
-        + '<p style="font-size:32px;font-weight:500;line-height:1.6">ولكل خدمة لون في منشوراتنا: هذا الصف بلون الهوية البصرية.</p>'
-        + spacer(44) + bottom(arrow=DK)
+        + '<p style="font-size:36px;font-weight:600;line-height:1.6">هكذا تبدو هويتنا مطبوعة، قطعة قطعة.</p>'
+        + GROW + bottom(arrow=DK)
     )
     return pg(body)
 
 
-def s_sizes():
-    sizes = [(520, "لافتة أو غلاف", True), (320, "ورقة رسمية", True), (210, "ختم أو قلم", False)]
-    rows = "".join(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;gap:30px;padding:24px 0;'
-        f'{"border-top:2px solid rgba(242,233,216,.16);" if k else ""}">'
-        f'<div style="font-size:32px;font-weight:600;color:{CH};white-space:nowrap">{lab}</div>{full(w, CH) if f else word(w, CH)}</div>'
-        for k, (w, lab, f) in enumerate(sizes))
-    body = (
-        top("الاختبار", 6, N)
-        + spacer(56)
-        + '<h1 style="font-size:70px;line-height:1.3">اختبرناه كبيراً<br>وصغيراً</h1>'
-        + spacer(22)
-        + '<p style="font-size:34px;font-weight:400;line-height:1.65;text-wrap:balance">'
-          'الخط <span class="ltr">Alexandria</span> للعربية والإنجليزية معاً، وفي المقاس الصغير جداً تكفي كلمة <span class="ltr">SHWANI</span> وحدها:</p>'
-        + spacer(36)
-        + card(rows, CARD_D, "20px 52px")
-        + GROW + tip("الشعار يظهر كاملاً دائماً، لا تقطعه حافة ولا يُختصر إلى حرف.", "القاعدة")
-        + spacer(44) + bottom(arrow=DK)
-    )
-    return pg(body)
+PIECES = [
+    ("التفاصيل", "16-executive-pen", "حتى قلمك يحمل اسمك",
+     'ورقة رسمية، وقلم فاخر محفور عليه <span class="ltr">SHWANI</span>، وطقم هدية لعميل مهم.'),
+    ("الأوراق الرسمية", "02-stationery", "كل ورقة تخرج من مكتبك",
+     "رسالة، وعرض سعر، وظرف، وبطاقة: كلها بهوية واحدة، فيعرفك الزبون من أول ورقة."),
+    ("داخل الشركة", "15-folder-badge", "الملف وبطاقة الموظف",
+     "الموظف يحمل اسم الشركة على صدره، والملف يجمع أوراق العميل بترتيب."),
+    ("التسويق", "06-brochure", "البروشور",
+     "خدماتك وطريقة العمل في ورقة تُطوى، ويأخذها الزبون معه."),
+    ("الهدايا", "14-mugs", "كوب على مكتب زبونك",
+     "هدية صغيرة يراها كل صباح، واسمك عليها."),
+    ("التعريف بالشركة", "07-company-profile", "الملف التعريفي",
+     "ثماني صفحات تعرّف بشركتك قبل أن تتكلم: من نحن، ولماذا نحن، وكيف نعمل."),
+    ("المعارض", "04-rollup", "الرول أب",
+     "في المعرض يُقرأ من بعيد: الاسم أولاً، ثم الجملة، ثم الخدمات."),
+    ("الهدايا الفاخرة", "08-notebook", "الدفتر والقلم الفاخر",
+     "هدية تبقى مع عميلك في كل اجتماع."),
+]
 
 
 def closing():
@@ -227,14 +132,14 @@ def closing():
         top("الحلقة القادمة", N, N)
         + deco(f"left:-110px;top:120px;width:270px;height:270px;border-radius:135px;background:{RO}")
         + deco(f"left:170px;top:300px;width:80px;height:80px;border-radius:40px;background:{CH}")
-        + spacer(100)
-        + '<h1 style="font-size:76px;line-height:1.35">تريد هوية<br>تحكي مشروعك؟</h1>'
+        + spacer(110)
+        + '<h1 style="font-size:76px;line-height:1.35">أيّ قطعة تريدها<br>لمشروعك؟</h1>'
         + spacer(24)
-        + '<p style="font-size:36px;line-height:1.6">نبدأ معك بالسؤال نفسه: ماذا يجب أن يقول شعارك؟</p>'
+        + '<p style="font-size:36px;line-height:1.6">اكتب رقم شريحتها في التعليقات، ونخبرك كيف نصمّمها لك.</p>'
         + GROW
         + f'<div class="z" style="background:{DK};color:{CH};border-radius:36px;padding:38px 44px">'
           f'<div style="font-size:30px;font-weight:700;margin-bottom:10px;color:{TE}">الحلقة 2</div>'
-          '<div style="font-size:48px;font-weight:800;line-height:1.4">الهوية على أرض الواقع</div></div>'
+          '<div style="font-size:48px;font-weight:800;line-height:1.4">فيلم هويتنا</div></div>'
         + spacer(34)
         + '<p style="font-size:32px;font-weight:600;line-height:1.6">احفظ المنشور، وأرسله لصاحب مشروع جديد.</p>'
         + spacer(44)
@@ -243,17 +148,20 @@ def closing():
     return pg(body)
 
 
-SLIDES = [cover(), s_goals(), s_idea(), s_shape(), s_colors(), s_sizes(), closing()]
+SLIDES = [cover()] + [piece(i, *p) for i, p in enumerate(PIECES, 2)] + [closing()]
+assert len(SLIDES) == N
 
 CHECK_JS = """() => { const S = document.querySelector('.s').getBoundingClientRect(), out = [];
   document.querySelectorAll('svg.wm').forEach((e, i) => { const r = e.getBoundingClientRect();
     const d = [r.left - S.left, S.right - r.right, r.top - S.top, S.bottom - r.bottom];
-    if (Math.min(...d) < 40) out.push('logo ' + i + ' margins px (L,R,T,B) ' + d.map(v => v.toFixed(0)).join(', ')); });
+    if (Math.min(...d) < 40) out.push('logo ' + i + ' margins px ' + d.map(v => v.toFixed(0)).join(', ')); });
+  const bot = document.querySelector('.bot').getBoundingClientRect();
+  document.querySelectorAll('h1, p').forEach(e => { const r = e.getBoundingClientRect();
+    if (r.bottom > bot.top - 8) out.push('text runs into the bottom bar: ' + e.textContent.slice(0, 30)); });
   return out; }"""
 
 
-async def check_marks():
-    """Marwa, 19 Oct: no logo cut or crowding the edge. Every SHWANI stays 40 px inside the slide."""
+async def check():
     from playwright.async_api import async_playwright
     bad = []
     async with async_playwright() as p:
@@ -269,8 +177,8 @@ async def check_marks():
 
 if __name__ == "__main__":
     render(HERE, SLIDES)
-    bad = asyncio.run(check_marks())
+    bad = asyncio.run(check())
     if bad:
-        print("MEASUREMENT CHECK FAILED:", *bad, sep="\n  ")
+        print("CHECK FAILED:", *bad, sep="\n  ")
         sys.exit(1)
-    print("measurement check: every logo inside the slide")
+    print("check: logos inside the slide, no text under the bottom bar")
