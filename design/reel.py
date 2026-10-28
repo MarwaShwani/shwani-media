@@ -43,6 +43,16 @@ def RT(t):
     return t + sum(j for h, j in HOLDS if t >= h)
 
 
+def load_intro(here, default):
+    """Length of a reel's opening scene: as long as the voice needs to ask the question naturally
+    (vo.py writes it to posts/NN/vo.json as "intro"; Marwa, 28 Oct, 4:12), else `default`."""
+    p = os.path.join(here, "vo.json")
+    if os.path.exists(p):
+        import json
+        return json.load(open(p)).get("intro", default)
+    return default
+
+
 def load_vo(here):
     """Read posts/NN/vo.json (written by vo.py) and switch the timeline to it. Returns it or None."""
     p = os.path.join(here, "vo.json")
@@ -357,9 +367,9 @@ class Reel:
               beat=.2):
         """'Think a little...' chip with a clock ring: at each beat one segment goes out and one clock tick plays,
         so the ticks you hear are exactly the beats you see (Marwa, 17 Oct).
-        Fast by default (Marwa, 28 Oct): the whole opening of a reel is 2 seconds at most, so the clock runs
-        a beat every 0.2 s (same wall-clock sound, just quicker) and is done in about 1.2 s.
-        The old 3-second clock was think(t, 3, beat=.5)."""
+        Fast by default (Marwa, 28 Oct): a beat every 0.2 s, the same wall-clock sound, just quicker.
+        The opening lasts as long as the voice needs to ask the question at ease (load_intro), so a reel
+        gives the clock that length: secs = opening - 0.8. The old 3-second clock was think(t, 3, beat=.5)."""
         c = 2 * math.pi * 30
         n = max(3, round(secs / beat))
         seg, gap = c / n, 3.2
@@ -442,6 +452,8 @@ class Reel:
                 v = _load_any(vpath)
                 i = int(t * SR); j = min(n, i + len(v))
                 mix[i:j] += v[:j - i]
+        if voice:                # a clock tick landing on a loud syllable must not poke above the calm level
+            mix = _limit(mix, VO_CEIL)
         peak = np.max(np.abs(mix)) or 1
         if peak > .9:            # only ever turned down, never boosted
             mix = mix / peak * .9
@@ -594,6 +606,23 @@ def _cat(*parts):
     for o, a in parts:
         i = int(o * SR); out[i:i + len(a)] += a
     return out
+
+
+VO_CEIL = 10 ** (-10 / 20)      # voice-over versions peak at about -10 dBFS (Marwa, 16 Oct)
+
+
+def _limit(x, ceil, block=.001, look=.005, release=.08):
+    """Gentle peak limiter: turns down only the few milliseconds that would pass `ceil`."""
+    b = max(1, int(block * SR))
+    n = (len(x) + b - 1) // b
+    pk = np.abs(np.pad(x, (0, n * b - len(x)))).reshape(n, b).max(axis=1)
+    g = np.minimum(1.0, ceil / np.maximum(pk, 1e-9))
+    k = int(look / block)
+    g = np.min(np.stack([np.roll(g, s) for s in range(-k, k + 1)]), axis=0)   # attack ahead of each peak
+    a = np.exp(-block / release)
+    for i in range(1, n):                                                     # slow release afterwards
+        g[i] = min(g[i], a * g[i - 1] + (1 - a))
+    return x * np.repeat(g, b)[:len(x)]
 
 
 @functools.lru_cache(maxsize=None)

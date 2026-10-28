@@ -3,9 +3,9 @@
 The 16:9 brand film (brand/film.py) re-cut for a phone: 1080x1920, every mockup shown whole and large,
 on the row-4 terracotta with charcoal text. Reel rules (SHWANI-COMPANY-project.md):
 - the question is on screen from the first frame, the first movement within half a second,
-  then a fast «فكّر قليلاً» clock (a tick every 0.2 s): the whole opening is 2 seconds (Marwa, 28 Oct:
-  a long wait loses the viewer, so every reel opens in 2 seconds at most), and the answer
-  «في كل مكان.» opens the photos;
+  then a fast «فكّر قليلاً» clock (a tick every 0.2 s, Marwa 28 Oct) for as long as the voice asks the
+  question naturally and at ease (Marwa, 28 Oct, 4:12: the opening fits the voice, no 2-second cap),
+  and the answer «في كل مكان.» opens the photos;
 - the photos come in groups, and each group's line is what the voice-over says at that moment;
 - the end card is worth saving (the first three pieces a company needs) and asks to send it on;
 - sounds: paper sliding for each photo, a soft whoosh between scenes, no chimes;
@@ -38,7 +38,7 @@ GROUPS = [
     ("وعلى كل شاشة", [("10-screens", "الشاشات")]),
 ]
 N_PHOTOS = sum(len(g[1]) for g in GROUPS)
-INTRO = 2.0                         # the opening, question to first photo (Marwa, 28 Oct: 2 s at most)
+INTRO = load_intro(HERE, 2.0)       # the opening, question to first photo: as long as the voice needs
 (T1, T2, T3), DUR = timeline([INTRO, N_PHOTOS * PHOTO_D + .6, 7.6])
 ANSWER_D = 1.0                      # «في كل مكان.» heads the first photo for a second, then the group lines
 DUR_DESIGN = DUR
@@ -56,7 +56,7 @@ def _group_starts():
 # Voice-over (Bodi, Marwa 28 Oct): each sentence is said the moment its line is on screen, in this order.
 # (design time, sentence, hold_at): if the sentence before runs long, the video waits at hold_at
 # (default: just before the line, so the photo and the group line on screen wait with it).
-# The question must fit the 2-second opening: vo.py speeds it up a little rather than make the opening wait.
+# The opening is sized to the question as spoken (vo.py writes "intro"), so the question is never rushed.
 _G = _group_starts()
 VO_PLAN = [
     (0.0, "بعد الشعار، أين تظهر هويتك؟", None),
@@ -106,7 +106,7 @@ def scene1():
     body = (
         R.txt(None, "بعد الشعار،<br>أين تظهر هويتك؟", 340, 92)
         + R.el(0, card, "zoom", d=.5, style="position:absolute;left:150px;top:650px;width:780px")
-        + R.think(.2, 1.2, top=1180, ring=DK, card="rgba(32,33,38,.08)", edge="rgba(32,33,38,.22)", track="rgba(32,33,38,.2)")
+        + R.think(.2, INTRO - .8, top=1180, ring=DK, card="rgba(32,33,38,.08)", edge="rgba(32,33,38,.22)", track="rgba(32,33,38,.2)")
     )
     return R.scene(0, T2, body, leave="sOutUp")
 
