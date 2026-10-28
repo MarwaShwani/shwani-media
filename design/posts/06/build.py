@@ -86,7 +86,7 @@ def scene1():
         + R.txt(None, "احفظ الشعارين", 392, 96)
         + cards + count
         + R.txt(hide + .4, "أيّهما تتذكّر شكله؟", 1050, 80, kind="pop", cue="question", out=show + .2)
-        + R.think(hide + 1.0, 3, top=1190)
+        + R.think(hide + 1.0, 3, top=1190, beat=.5)
         + R.txt(show + .5, "البسيط يبقى في الذاكرة.", 1080, 74, kind="pop", cue="ding")
         + R.txt(show + 1.0, "والمزدحم يُنسى بسرعة.", 1200, 50, weight=600)
     )

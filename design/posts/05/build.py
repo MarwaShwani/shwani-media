@@ -53,7 +53,7 @@ def scene1():
         + option(.4, 690, "دقيقة كاملة", dim_t=tap + .15)
         + option(.6, 850, "نصف دقيقة", dim_t=tap + .15)
         + option(.8, 1010, "7 ثوانٍ", pick_t=tap)
-        + R.think(1.3, 3, top=1200, ring=SL)
+        + R.think(1.3, 3, top=1200, ring=SL, beat=.5)
         + R.cursor([(4.6, 760, 1560, "show"), (tap, 560, 1078, "tap"), (tap + .9, 640, 1460, "hide")])
         + R.txt(tap + .6, "7 ثوانٍ فقط!", 1195, 84, kind="pop", cue="ding")
         + R.txt(tap + 1.2, "ثم يقرّر: يكمل القراءة، أو ينتقل لغيرك.", 1325, 46, weight=600)

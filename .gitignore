@@ -2,3 +2,8 @@ design/brand/out/
 design/brand/scenes/
 design/brand/__pycache__/
 design/node_modules/
+design/posts/*/img/
+design/posts/*/*.mp4
+design/posts/*/*.html
+design/posts/*/contact.png
+design/posts/*/cover.png

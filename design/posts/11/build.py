@@ -3,7 +3,9 @@
 The 16:9 brand film (brand/film.py) re-cut for a phone: 1080x1920, every mockup shown whole and large,
 on the row-4 terracotta with charcoal text. Reel rules (SHWANI-COMPANY-project.md):
 - the question is on screen from the first frame, the first movement within half a second,
-  then «فكّر قليلاً» for 3 seconds with one clock tick per beat;
+  then a fast «فكّر قليلاً» clock (a tick every 0.2 s): the whole opening is 2 seconds (Marwa, 28 Oct:
+  a long wait loses the viewer, so every reel opens in 2 seconds at most), and the answer
+  «في كل مكان.» opens the photos;
 - the photos come in groups, and each group's line is what the voice-over says at that moment;
 - the end card is worth saving (the first three pieces a company needs) and asks to send it on;
 - sounds: paper sliding for each photo, a soft whoosh between scenes, no chimes;
@@ -36,7 +38,36 @@ GROUPS = [
     ("وعلى كل شاشة", [("10-screens", "الشاشات")]),
 ]
 N_PHOTOS = sum(len(g[1]) for g in GROUPS)
-(T1, T2, T3), DUR = timeline([6.2, N_PHOTOS * PHOTO_D + .6, 7.6])
+INTRO = 2.0                         # the opening, question to first photo (Marwa, 28 Oct: 2 s at most)
+(T1, T2, T3), DUR = timeline([INTRO, N_PHOTOS * PHOTO_D + .6, 7.6])
+ANSWER_D = 1.0                      # «في كل مكان.» heads the first photo for a second, then the group lines
+DUR_DESIGN = DUR
+
+
+def _group_starts():
+    t, out = T2 + .2, []
+    for gi, (_, items) in enumerate(GROUPS):
+        out.append(T2 + ANSWER_D + .1 if gi == 0 else t)
+        t += len(items) * PHOTO_D
+    return out
+
+
+# Voice-over (Bodi, Marwa 28 Oct): each sentence is said the moment its line is on screen, in this order.
+# (design time, sentence, hold_at): if the sentence before runs long, the video waits at hold_at
+# (default: just before the line, so the photo and the group line on screen wait with it).
+# The question must fit the 2-second opening: vo.py speeds it up a little rather than make the opening wait.
+_G = _group_starts()
+VO_PLAN = [
+    (0.0, "بعد الشعار، أين تظهر هويتك؟", None),
+    (T2, "في كل مكان.", None),
+    (_G[0], "في المكتب،", None),
+    (_G[1], "في المعارض وعلى الطريق،", None),
+    (_G[2], "على فريق العمل،", None),
+    (_G[3], "في هدايا العملاء،", None),
+    (_G[4], "وعلى كل شاشة.", None),
+    (T3, "أول ثلاث قطع لشركتك: بطاقة العمل، والورق الرسمي والظرف، والملف التعريفي.", None),
+    (T3 + 2.2, "احفظه قبل أن تطبع هويتك، وأرسله لصاحب مشروع جديد.", T3 + 2.21),
+]
 VO = load_vo(HERE)
 if VO:
     DUR = VO["dur"]
@@ -73,20 +104,21 @@ def scene1():
             f'box-shadow:0 30px 70px rgba(32,33,38,.3)">{lockup_svg(600, CH)}</div>')
     body = (
         R.txt(None, "بعد الشعار،<br>أين تظهر هويتك؟", 340, 92)
-        + R.el(.2, card, "zoom", d=.8, style="position:absolute;left:150px;top:650px;width:780px")
-        + R.think(.6, 3, top=1180, ring=DK, card="rgba(32,33,38,.08)", edge="rgba(32,33,38,.22)", track="rgba(32,33,38,.2)")
-        + R.txt(4.6, "في كل مكان.", 1200, 64, kind="pop")
+        + R.el(0, card, "zoom", d=.5, style="position:absolute;left:150px;top:650px;width:780px")
+        + R.think(.2, 1.2, top=1180, ring=DK, card="rgba(32,33,38,.08)", edge="rgba(32,33,38,.22)", track="rgba(32,33,38,.2)")
     )
     return R.scene(0, T2, body, leave="sOutUp")
 
 
 # ---------------- scene 2: the photos, group by group ----------------
 def scene2():
-    t = T2 + .3
-    body = ""
+    t = T2 + .2
+    body = R.txt(T2, "في كل مكان.", 318, 64, kind="pop", d=.5, out=T2 + ANSWER_D - .3)
     box_w, box_h, box_top = 1000, 880, 430
     for gi, (line, items) in enumerate(GROUPS):
         g0, g1 = t, t + len(items) * PHOTO_D
+        if gi == 0:
+            g0 = T2 + ANSWER_D + .1
         last = gi == len(GROUPS) - 1
         body += R.txt(g0, line, 318, 60, kind="fromR", out=None if last else g1 - .3)
         for name, label in items:
@@ -142,5 +174,5 @@ def build():
 
 if __name__ == "__main__":
     html = build()
-    stills = [0.0, .6, 2.5, 5.0, 7.0, 9.4, 13.0, 15.0, 19.4, 23.0, 27.0, 31.0, 34.6, 37.5, DUR - .1]
-    R.render(HERE, html, DUR, cover_html=cover(), stills=[RT(x) for x in stills], voice=VO["voice"] if VO else None)
+    stills = [0.0, .5, 1.0, 1.45, 2.4, 3.4, 8.6, 14.6, 18.6, 22.6, 26.6, 29.6, 32.0, 34.5, DUR - .1]
+    R.render(HERE, html, DUR, cover_html=cover(), stills=[RT(x) if x < DUR - .1 else x for x in stills], voice=VO["voice"] if VO else None)

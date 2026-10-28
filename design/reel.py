@@ -353,11 +353,15 @@ class Reel:
             return f'<div style="{style}">{text}</div>'
         return self.el(t, text, kind, d=d, cue=cue, out=out, style=style)
 
-    def think(self, t, secs=3, top=1330, ring=TE, card="rgba(32,33,38,.05)", edge="rgba(32,33,38,.14)", track="rgba(32,33,38,.15)"):
-        """'Think a little...' chip with a clock ring of 2 beats a second: at each beat one segment goes out
-        and one clock tick plays, so the ticks you hear are exactly the beats you see (Marwa, 17 Oct)."""
+    def think(self, t, secs=1.2, top=1330, ring=TE, card="rgba(32,33,38,.05)", edge="rgba(32,33,38,.14)", track="rgba(32,33,38,.15)",
+              beat=.2):
+        """'Think a little...' chip with a clock ring: at each beat one segment goes out and one clock tick plays,
+        so the ticks you hear are exactly the beats you see (Marwa, 17 Oct).
+        Fast by default (Marwa, 28 Oct): the whole opening of a reel is 2 seconds at most, so the clock runs
+        a beat every 0.2 s (same wall-clock sound, just quicker) and is done in about 1.2 s.
+        The old 3-second clock was think(t, 3, beat=.5)."""
         c = 2 * math.pi * 30
-        n, beat = secs * 2, .5
+        n = max(3, round(secs / beat))
         seg, gap = c / n, 3.2
         segs = ""
         for k in range(n):

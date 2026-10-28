@@ -152,7 +152,7 @@ def scene1():
         R.txt(None, "أيّ مدرسة تثق بها", 320, 96, out=twist - .2)
         + R.txt(None, "لطفلك؟", 440, 96, color=TE, out=twist - .2)
         + film + before + after
-        + R.think(1.4 + OFF, 3, top=1050, card="rgba(242,233,216,.1)", edge=EDGE, track="rgba(242,233,216,.25)")
+        + R.think(1.4 + OFF, 3, top=1050, card="rgba(242,233,216,.1)", edge=EDGE, track="rgba(242,233,216,.25)", beat=.5)
         + R.cursor([(4.6 + OFF, 760, 1500, "show"), (tap, 300, 805, "tap"), (tap + .8, 420, 1400, "hide")])
         + R.txt(tap + .6, "اخترتها في ثانية، صحيح؟", 1050, 62, kind="pop", cue="ding", out=twist + .6)
         + R.txt(twist, "المدرسة نفسها!", 380, 100, color=TE, kind="pop", cue="pop", extra="white-space:nowrap")
