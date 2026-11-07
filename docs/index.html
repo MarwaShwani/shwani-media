@@ -107,7 +107,10 @@ html.ondark .cue .bar{background:rgba(242,233,216,.2)}
 #hero .stk{position:sticky;top:calc(100vh - 1296 * var(--u));height:calc(1296 * var(--u));overflow:hidden}
 #hero .img{position:absolute;left:0;right:0;top:calc(250 * var(--u));height:calc(1046 * var(--u));overflow:hidden}   /* v14.1: the slow zoom stays inside the frame, so no strip of sky shows above the shade (Marwa, 7 Nov 2026, 8 pm) */
 #hero .img img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
-#hero .img::before{content:"";position:absolute;inset:0 0 auto;height:44%;background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 0%,transparent));z-index:1;transition:background .6s}
+/* v14.2: the picture fades into the page through a mask on its frame, not a shade drawn over it: while the picture
+   grows (scale 1 to 1.07) the shade and the picture met on a fractional pixel, and phones and laptops at 125-150%
+   showed a thin dark line across the screen at the top edge. Same fade as before: page colour at the top, none at 44%. */
+#hero .img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44%);mask-image:linear-gradient(to bottom,transparent 0,#000 44%)}
 #hero h1{position:absolute;left:calc(173 * var(--u));width:calc(1079 * var(--u));top:calc(72 * var(--u));font-size:calc(83.52 * var(--u));line-height:1.5;text-align:center;z-index:2}
 #hero .desc{position:absolute;left:0;right:0;top:calc(477 * var(--u));text-align:center;font-size:calc(13.68 * var(--u));font-weight:500;z-index:2}
 #hero .tog{position:absolute;left:0;right:0;top:calc(542 * var(--u));display:flex;justify-content:center;gap:calc(12 * var(--u));z-index:2;font-size:calc(12 * var(--u))}
