@@ -3,3 +3,5 @@ package*.json
 posts/*/slide-*
 posts/*/contact*.png
 __pycache__/
+_cache/
+assets/

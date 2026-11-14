@@ -24,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DESIGN = os.path.dirname(HERE)
 REPO = os.path.dirname(DESIGN)
 sys.path.insert(0, DESIGN)
-from common import fontlinks, require_font, FONT_OK_JS, HANDLE, SL, TL, SG, RO  # noqa: E402
+from common import fontlinks, require_font, FONT_OK_JS, HANDLE, SL, TL, SG, RO, PL  # noqa: E402
 from rounded import lockup, CH, MU, DK, TE  # noqa: E402
 from PIL import Image  # noqa: E402
 
@@ -67,6 +67,7 @@ ICON = {
     "pen": '<path d="M14.5 5.5l4 4L9 19H5v-4z"/><path d="M12.5 7.5l4 4"/><path d="M4 21h16"/>',
     "card": '<rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8.5 17c.6-2 1.9-3 3.5-3s2.9 1 3.5 3"/>',
     "cap": '<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.5V16c1.6 1.6 3.4 2.3 5.5 2.3s3.9-.7 5.5-2.3v-4.5"/><path d="M21.5 9.5v5"/>',
+    "book": '<path d="M12 6.5c-2.2-1.6-5.2-2.1-8-1.5v13c2.8-.6 5.8-.1 8 1.5 2.2-1.6 5.2-2.1 8-1.5V5c-2.8-.6-5.8-.1-8 1.5z"/><path d="M12 6.5v13"/>',
     "question": '<circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.3-2.6 4.1"/><path d="M12 17.6h.01"/>',
 }
 
@@ -342,11 +343,12 @@ def post_card(post, kind, posts):
 
 # ---------------------------------------------------------------- highlight covers
 HIGHLIGHTS = [("رأيك", "chart", MU), ("أعمالنا", "star", SG), ("الخدمات", "pen", TE), ("اطلب", "chat", RO),
-              ("السيرة", "card", SL), ("المشاريع", "cap", TL), ("أسئلتكم", "question", CH)]
+              ("السيرة", "card", SL), ("المشاريع", "cap", TL), ("أسئلتكم", "question", CH),
+              ("الملازم", "book", PL)]   # Marwa, 14 Nov: the free booklets get their own highlight (purple = offers)
 
 
 def highlight(ic, col):
-    fg = CH if col in (TL, SL) else DK
+    fg = CH if col in (TL, SL, PL) else DK
     body = (f'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">'
             f'<div style="width:642px;height:642px;border-radius:50%;background:{col};display:flex;align-items:center;justify-content:center">'
             f'{icon(ic, 318, fg, 1.7)}</div></div>')
@@ -445,10 +447,11 @@ def main(spec_path):
     os.makedirs(os.path.join(outdir, "preview"), exist_ok=True)
     posts = data["posts"]
     jobs, manifest = [], []
+    slots = data.get("slots", SLOTS)     # week 2 (15 Nov): posts at 12:30 and 21:00, so 12:35 and 21:05 reshare them
     for day in data["days"]:
         times = [st["time"] for st in day["stories"]]
-        if times != SLOTS:
-            raise SystemExit(f"day {day['day']}: slots {times} != {SLOTS}")
+        if times != slots:
+            raise SystemExit(f"day {day['day']}: slots {times} != {slots}")
         for st in day["stories"]:
             base = f"d{day['day']}-{st['time'].replace(':', '')}"
             files = {}
@@ -475,7 +478,7 @@ def main(spec_path):
     for name, _, _ in jobs:
         Image.open(os.path.join(outdir, name + ".png")).convert("RGB").resize((540, 960), Image.LANCZOS) \
             .save(os.path.join(outdir, "preview", name + ".jpg"), quality=82)
-    json.dump({"week": data["week"], "start": data["start"], "slots": SLOTS, "stories": manifest,
+    json.dump({"week": data["week"], "start": data["start"], "slots": slots, "stories": manifest,
                "highlights": [{"name": n, "file": f"highlight-{i}.png"} for i, (n, _, _) in enumerate(HIGHLIGHTS, 1)]},
               open(os.path.join(outdir, "manifest.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     ig = [os.path.join(outdir, m["files"]["ig"]) if "ig" in m["files"] else os.path.join(outdir, m["files"]["fb"]) for m in manifest]
