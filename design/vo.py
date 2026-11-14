@@ -17,7 +17,7 @@ The take is one recording of all the sentences in that order, with a clear pause
 
 Then: python3 posts/NN/build.py  (reel.mp4 = effects only, reel-vo.mp4 = with the voice).
 """
-import importlib.util, json, os, sys, wave
+import importlib.util, json, os, re, sys, wave
 import numpy as np
 
 DESIGN = os.path.dirname(os.path.abspath(__file__))
@@ -44,8 +44,59 @@ def save(path, x):
         w.writeframes((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
 
 
-def split(x, n, frame=.02, floor_db=-38, min_gap=.25):
-    """Cut x into n sentences at its n-1 longest pauses."""
+HARAKAT = re.compile("[ً-ٰٟـ]")
+PAUSE_MARKS = "،؛:؟?.!,"
+
+
+def weight(text):
+    """Rough spoken length of a sentence: its letters, plus a little for each pause inside it."""
+    t = HARAKAT.sub("", text).strip().rstrip(PAUSE_MARKS)
+    return sum(ch.isalpha() for ch in t) + 4 * sum(ch in PAUSE_MARKS for ch in t)
+
+
+def align(gaps, first, end, texts, frame, gap_w=2.0):
+    """Pick the n-1 pauses that cut the take into sentences whose lengths best match the texts.
+
+    (14 Nov: Gemini's pause after a question inside a sentence can be as long as the <long pause>
+    between sentences, so the longest pauses alone cut reel 17 in the wrong places.)
+    Cost: squared log ratio of each sentence's length to its share of the take, minus the length
+    of the chosen pauses (longer pauses are likelier boundaries)."""
+    n, gs = len(texts), sorted(gaps, key=lambda g: g[1])
+    w = np.array([weight(t) for t in texts], float)
+    span = (end - first) * frame
+    exp = w / w.sum() * span
+    m, INF = len(gs), float("inf")
+
+    def seg(k, a, b):        # sentence k from frame a to frame b
+        return np.log(max((b - a) * frame, .05) / exp[k]) ** 2
+
+    best = [[INF] * m for _ in range(n - 1)]
+    back = [[-1] * m for _ in range(n - 1)]
+    for j, (L, a, b) in enumerate(gs):
+        best[0][j] = seg(0, first, a) - gap_w * L * frame
+    for k in range(1, n - 1):
+        for j, (L, a, b) in enumerate(gs):
+            for i in range(j):
+                if best[k - 1][i] == INF:
+                    continue
+                c = best[k - 1][i] + seg(k, gs[i][2], a) - gap_w * L * frame
+                if c < best[k][j]:
+                    best[k][j], back[k][j] = c, i
+    tot = [best[n - 2][j] + seg(n - 1, gs[j][2], end) for j in range(m)]
+    j = int(np.argmin(tot))
+    picked = []
+    for k in range(n - 2, -1, -1):
+        picked.append(gs[j]); j = back[k][j]
+    picked.reverse()
+    print("cuts at", ", ".join(f"{a * frame:.2f}s ({L * frame:.2f}s pause)" for L, a, b in picked))
+    edges = [first] + [v for _, a, b in picked for v in (a, b)] + [end]
+    print("length / expected:", " ".join(f"{(edges[2 * k + 1] - edges[2 * k]) * frame / exp[k]:.2f}" for k in range(n)))
+    return [(a, b) for _, a, b in picked]
+
+
+def split(x, n, frame=.02, floor_db=-38, min_gap=.25, texts=None):
+    """Cut x into n sentences: at its n-1 longest pauses, or, given the texts, at the pauses that
+    best match their lengths (align)."""
     hop = int(frame * SR)
     rms = np.array([np.sqrt(np.mean(x[i:i + hop] ** 2)) for i in range(0, len(x) - hop, hop)])
     peak = rms.max() or 1
@@ -65,8 +116,11 @@ def split(x, n, frame=.02, floor_db=-38, min_gap=.25):
             k += 1
     if len(gaps) < n - 1:
         sys.exit(f"found {len(gaps) + 1} sentences in the take, the plan has {n}: check the pauses")
-    cuts = sorted(gaps, key=lambda g: -g[0])[:n - 1]
-    cuts = sorted((a, b) for _, a, b in cuts)
+    if texts:
+        cuts = align(gaps, first, last + 1, texts, frame)
+    else:
+        cuts = sorted(gaps, key=lambda g: -g[0])[:n - 1]
+        cuts = sorted((a, b) for _, a, b in cuts)
     bounds, s = [], first
     for a, b in cuts:
         bounds.append((s, a)); s = b
@@ -113,7 +167,8 @@ def main():
     here = os.path.join(DESIGN, "posts", nn)
     vo_json = os.path.join(here, "vo.json")
 
-    parts = split(load(take), _plan_len(here))
+    texts = [t for _, t, _ in _import_build(here).VO_PLAN]
+    parts = split(load(take), len(texts), texts=texts)
     parts = [p if i == 0 else squeeze(p, PAUSE_KEEP) for i, p in enumerate(parts)]
     intro = round(max(MIN_INTRO, len(parts[0]) / SR + GAP_OPENING), 2)
     # the opening scene is built as long as the question needs: build.py reads "intro" before its timeline
